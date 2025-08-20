@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class AuthDeleteRequest {
     @NotBlank(message="아이디와 비밀번호는 필수 입력 항목 입니다.")
-    @Email(message="올바른 아이디 형식이 아닙니다.")
+    @Email(message="올바른 이메일 형식이 아닙니다.")
     private String email;
     @NotBlank(message="아이디와 비밀번호는 필수 입력 항목 입니다.")
     private String password;

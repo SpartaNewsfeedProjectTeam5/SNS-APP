@@ -9,4 +9,6 @@ public class AuthLoginRequest {
     private String email;
     @NotBlank
     private String password;
+
+    //email 형식 검사
 }
