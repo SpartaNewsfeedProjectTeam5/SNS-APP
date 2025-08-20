@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.snsapp.domain.user.entity.User;
 import org.example.snsapp.global.entity.BaseEntity;
+import org.example.snsapp.global.enums.LikeContentType;
 
 @Entity
 @Getter
@@ -15,11 +16,12 @@ public class Like extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     @Column(nullable = false, length = 30)
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private LikeContentType type;
     @Column(name = "type_id", nullable = false)
     private Long typeId;
 
-    public Like(User user, String type, Long typeId) {
+    public Like(User user, LikeContentType type, Long typeId) {
         this.user = user;
         this.type = type;
         this.typeId = typeId;
