@@ -18,11 +18,11 @@ public class User extends AuditableEntity {
 
     private String password;
 
-    private String userName;
+    private String username;
 
     private int age;
 
-    private boolean isDeleted;
+    private boolean isResign;
 
     private String profileImage;
 }
