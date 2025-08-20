@@ -14,32 +14,28 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class NotifyEntity extends BaseEntity{
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; //id 나중에 지우기
+    @ManyToOne(fetch=FetchType.LAZY, optional=false)
+    @JoinColumn(name = "from_id")
+    @Column(nullable=false)
+    private User fromUser; //보낸 유저
 
-    private Long fromId; //보낸 유저
-
-    private Long toId; //받는 유저
+    @ManyToOne(fetch=FetchType.LAZY, optional=false)
+    @JoinColumn(name = "to_id")
+    @Column(nullable=false)
+    private User toUser; //받는 유저
 
     @Column(nullable=false, length=30)
     @Enumerated(EnumType.STRING)
     private NotificationContentType type; //타입
 
-    @Column(length = 250)
+    @Column(nullable=false, length = 250)
     private String message; //메세지
 
-    private LocalDateTime createdAt; //생성일
-
-    @ManyToOne(fetch=FetchType.LAZY, optional=false)
-    @JoinColumn(name = "user_entity_id")
-    private UserEntity userEntity; //유저 엔티티와 다대일 관계
-
-    public NotifyEntity(Long fromId, Long toId, NotificationContentType type, String message, LocalDateTime createdAt) {
-        this.fromId = fromId;
-        this.toId = toId;
+    public NotifyEntity(Long fromUser, Long toUser, NotificationContentType type, String message) {
+        this.fromUser = fromUser;
+        this.toUser = toUser;
         this.type = type;
         this.message = message;
-        this.createdAt = createdAt;
     }
 }
 
