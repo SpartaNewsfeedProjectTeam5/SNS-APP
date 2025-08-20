@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.snsapp.domain.user.dto.UserUpdateRequest;
 import org.example.snsapp.global.entity.AuditableEntity;
 
 @Getter
@@ -49,5 +50,11 @@ public class User extends AuditableEntity {
                 .isResign(false)
                 .profileImage(profileImage)
                 .build();
+    }
+
+    public void updateUserProfile(UserUpdateRequest dto) {
+        this.username = dto.getUsername();
+        this.age = dto.getAge();
+        this.profileImage = dto.getProfileImage();
     }
 }
