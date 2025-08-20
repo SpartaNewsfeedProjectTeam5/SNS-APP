@@ -4,36 +4,29 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import org.example.snsapp.domain.post.entity.Post;
+import org.example.snsapp.domain.user.entity.User;
+import org.example.snsapp.global.entity.AuditableEntity;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment {
+public class Comment extends AuditableEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @Column(name = "user_id", nullable = false)
-    private String userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 
-    @Column(name = "post_id", nullable = false)
-    private Long postId;
-
-    @Column(name = "comment", nullable = false, length = 500)
+    @Column(name = "comment", nullable = false, length = 100)
     private String comment;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "modified_at", nullable = false)
-    private LocalDateTime modifiedAt;
-
-    public Comment(String userId, Long postId, String comment) {
-        this.userId = userId;
-        this.postId = postId;
+    public Comment(User user, Post post, String comment) {
+        this.user = user;
+        this.post = post;
         this.comment = comment;
     }
 
