@@ -1,6 +1,7 @@
 package org.example.snsapp.domain.user.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,7 @@ import org.example.snsapp.global.entity.AuditableEntity;
 
 @Getter
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends AuditableEntity {
 
     @Column(unique = true, nullable = false, length = 40)
@@ -26,15 +27,27 @@ public class User extends AuditableEntity {
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isResign;
 
+    @Column(length = 255)
     private String profileImage;
 
     @Builder
-    public User(String email, String password, String username, int age, boolean isResign, String profileImage) {
+    private User(String email, String password, String username, int age, boolean isResign, String profileImage) {
         this.email = email;
         this.password = password;
         this.username = username;
         this.age = age;
         this.isResign = isResign;
         this.profileImage = profileImage;
+    }
+
+    public static User create(String email, String password, String username, int age, boolean isResign, String profileImage) {
+        return User.builder()
+                .email(email)
+                .password(password)
+                .username(username)
+                .age(age)
+                .isResign(false)
+                .profileImage(profileImage)
+                .build();
     }
 }
