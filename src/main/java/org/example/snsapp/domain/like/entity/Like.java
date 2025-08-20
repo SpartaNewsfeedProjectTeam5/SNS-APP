@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.catalina.User;
+import org.example.snsapp.domain.user.entity.User;
 import org.example.snsapp.global.entity.BaseEntity;
 
 @Entity
