@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-enum LikeContentType {
+public enum LikeContentType {
     POST("게시글"),
     COMMENT("댓글");
 
