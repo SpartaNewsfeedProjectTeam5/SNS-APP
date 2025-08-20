@@ -1,4 +1,4 @@
-package org.example.snsapp.global.entity;
+package org.example.snsapp.domain.comment.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
