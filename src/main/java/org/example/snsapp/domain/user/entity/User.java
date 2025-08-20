@@ -10,19 +10,30 @@ import org.example.snsapp.global.entity.AuditableEntity;
 @NoArgsConstructor
 public class User extends AuditableEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(unique = true)
+    @Column(unique = true, nullable = false, length = 40)
     private String email;
 
+    @Column(nullable = false, length = 225)
     private String password;
 
+    @Column(nullable = false, length = 4)
     private String username;
 
+    @Column(nullable = false)
     private int age;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isResign;
 
+    @Column(length = 255)
     private String profileImage;
+
+    public User(String email, String password, String username, int age, boolean isResign, String profileImage) {
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.age = age;
+        this.isResign = isResign;
+        this.profileImage = profileImage;
+    }
 }
