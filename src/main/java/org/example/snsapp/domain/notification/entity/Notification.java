@@ -4,13 +4,15 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.example.snsapp.domain.notification.Enum.NotificationContentType;
+import org.example.snsapp.domain.user.entity.User;
+import org.example.snsapp.global.entity.BaseEntity;
+import org.example.snsapp.global.enums.NotificationContentType;
 
 @Entity
 @Getter
 @Table(name="notification")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Notification extends BaseEntity{
+public class Notification extends BaseEntity {
 
     @ManyToOne(fetch=FetchType.LAZY, optional=false)
     @JoinColumn(name = "from_id")
@@ -29,7 +31,7 @@ public class Notification extends BaseEntity{
     @Column(nullable=false, length = 250)
     private String message; //메세지
 
-    public NotificationEntity(User fromUser, User toUser, NotificationContentType type, String message) {
+    public Notification(User fromUser, User toUser, NotificationContentType type, String message) {
         this.fromUser = fromUser;
         this.toUser = toUser;
         this.type = type;
