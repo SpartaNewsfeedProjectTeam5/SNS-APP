@@ -26,7 +26,7 @@ public class AuthService {
         User user = authRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new EntityNotFoundException("없는 회원입니다.") );
         if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             HttpSession session = request.getSession();
-            session.setAttribute(Const.LOGIN_USER, user);
+            session.setAttribute(Const.LOGIN_USER, user.getId());
             return ResponseEntity.ok().body(new AuthLoginResponse(loginRequest.getEmail()));
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 일치하지 않습니다.");
@@ -45,7 +45,7 @@ public class AuthService {
     public ResponseEntity delete(AuthDeleteRequest deleteRequest) {
         if ((authRepository.findByEmail(deleteRequest.getEmail())).isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("이미 탈퇴했거나 존재하지 않는 회원 입니다.");
-        }
+        } // boolean으로 체크
         User user = authRepository.findByEmail(deleteRequest.getEmail()).orElseThrow(EntityNotFoundException::new);
         if (passwordEncoder.matches(deleteRequest.getPassword(), user.getPassword())) {
             authRepository.setTrueUserIsResign(user.getId());
@@ -53,4 +53,6 @@ public class AuthService {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 일치하지 않습니다.");
     }
+
+    //세션 분리, responseEntity -> dto 변경, 에러 반환 enum으로 처리
 }

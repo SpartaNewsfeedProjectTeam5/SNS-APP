@@ -10,4 +10,6 @@ public class AuthLogoutResponse {
         this.message = message;
         this.loggedOutAt = LocalDateTime.now();
     }
+
+    //message 하드 코딩
 }
