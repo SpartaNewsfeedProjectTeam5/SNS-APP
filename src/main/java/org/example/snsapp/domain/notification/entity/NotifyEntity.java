@@ -15,21 +15,22 @@ import java.time.LocalDateTime;
 public class NotifyEntity extends BaseEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; //id
+    private Long id; //id 나중에 지우기
 
     private Long fromId; //보낸 유저
 
     private Long toId; //받는 유저
 
-    @Column(nullable=false)
+    @Column(nullable=false, length=30)
     @Enumerated(EnumType.STRING)
     private NotificationContentType type; //타입
 
+    @Column(length = 250)
     private String message; //메세지
 
     private LocalDateTime createdAt; //생성일
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY, optional=false)
     @JoinColumn(name = "user_entity_id")
     private UserEntity userEntity; //유저 엔티티와 다대일 관계
 
