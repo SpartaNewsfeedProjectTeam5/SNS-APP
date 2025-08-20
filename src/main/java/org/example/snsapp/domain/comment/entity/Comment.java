@@ -19,6 +19,9 @@ public class Comment {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
+    @Column(name = "post_id", nullable = false)
+    private Long postId;
+
     @Column(name = "comment", nullable = false, length = 500)
     private String comment;
 
@@ -27,8 +30,10 @@ public class Comment {
 
     @Column(name = "modified_at", nullable = false)
     private LocalDateTime modifiedAt;
-    public Comment(String userId, String comment) {
+
+    public Comment(String userId, Long postId, String comment) {
         this.userId = userId;
+        this.postId = postId;
         this.comment = comment;
     }
 
