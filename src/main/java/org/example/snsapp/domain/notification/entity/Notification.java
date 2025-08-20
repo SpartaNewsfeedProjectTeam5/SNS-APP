@@ -16,12 +16,10 @@ public class Notification extends BaseEntity {
 
     @ManyToOne(fetch=FetchType.LAZY, optional=false)
     @JoinColumn(name = "from_id")
-    @Column(nullable=false)
     private User fromUser; //보낸 유저
 
     @ManyToOne(fetch=FetchType.LAZY, optional=false)
     @JoinColumn(name = "to_id")
-    @Column(nullable=false)
     private User toUser; //받는 유저
 
     @Column(nullable=false, length=30)
