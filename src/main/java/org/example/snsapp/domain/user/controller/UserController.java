@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.snsapp.domain.user.dto.*;
 import org.example.snsapp.domain.user.service.UserService;
 import org.example.snsapp.global.constant.Const;
+import org.example.snsapp.global.enums.ErrorCode;
+import org.example.snsapp.global.exception.CustomException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,17 +31,21 @@ public class UserController {
 
     @PutMapping("/v1/users/me/profile")
     public ResponseEntity<UserUpdateResponse> updateUserProfile(
-            @SessionAttribute(name = Const.LOGIN_USER) String email,
+            @SessionAttribute(name = Const.LOGIN_USER, required = false) String email,
             @Valid @RequestBody UserUpdateRequest dto
     ) {
+        if (email == null) throw new CustomException(ErrorCode.NEED_AUTH);
+
         return ResponseEntity.ok(userService.updateUserProfile(email, dto));
     }
 
     @PutMapping("/v1/users/me/password")
     public ResponseEntity<UserPasswordResponse> updatePassword(
-            @SessionAttribute(name = Const.LOGIN_USER) String email,
+            @SessionAttribute(name = Const.LOGIN_USER, required = false) String email,
             @Valid @RequestBody UserPasswordRequest dto
     ) {
+        if (email == null) throw new CustomException(ErrorCode.NEED_AUTH);
+
         return ResponseEntity.ok(userService.updatePassword(email, dto));
     }
 }
