@@ -10,6 +10,7 @@ import org.example.snsapp.global.enums.LikeContentType;
 
 @Entity
 @Getter
+@Table(name = "content_like")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Like extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
