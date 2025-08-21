@@ -11,4 +11,6 @@ public interface AuthRepository extends JpaRepository<User,Long> {
     @Modifying
     @Query("UPDATE User u SET u.isResign = true WHERE u.id = :id")
     void setTrueUserIsResign(Long id);
+    @Query("SELECT u.isResign FROM User u WHERE u.email = :email")
+    Boolean userIsResignTrue(String email);
 }
