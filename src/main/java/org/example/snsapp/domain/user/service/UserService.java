@@ -57,6 +57,6 @@ public class UserService {
         // 수정 후 DTO를 바로 반환하기 위해 강제로 DB에 반영
         userRepository.saveAndFlush(user);
 
-        return UserPasswordResponse.ofSuccess("비밀번호가 성공적으로 변경 되었습니다.", user.getModifiedAt());
+        return UserPasswordResponse.create("비밀번호가 성공적으로 변경 되었습니다.", user.getModifiedAt());
     }
 }
