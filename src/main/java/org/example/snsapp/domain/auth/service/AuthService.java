@@ -35,7 +35,6 @@ public class AuthService {
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword()))
             throw new CustomException(ErrorCode.AUTH_ERROR);
 
-
         return new AuthLoginResponse(user.getEmail());
     }
 
