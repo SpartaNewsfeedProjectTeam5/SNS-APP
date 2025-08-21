@@ -30,7 +30,7 @@ public class UserUpdateResponse {
                 .username(user.getUsername())
                 .age(user.getAge())
                 .profileImage(user.getProfileImage())
-                .modifiedAt(user.getLastModified())
+                .modifiedAt(user.getModifiedAt())
                 .build();
     }
 }
