@@ -6,10 +6,8 @@ import org.example.snsapp.domain.user.dto.UserUpdateRequest;
 import org.example.snsapp.domain.user.dto.UserUpdateResponse;
 import org.example.snsapp.domain.user.entity.User;
 import org.example.snsapp.domain.user.repository.UserRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -26,12 +24,8 @@ public class UserService {
     }
 
     @Transactional
-    public UserUpdateResponse updateUserProfile(UserUpdateRequest dto) {
-        //  TODO: 세션 미구현으로 임시 하드코딩 값 사용
-        Long userId = 3L; // 임시 하드코딩 (테스트용)
-
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+    public UserUpdateResponse updateUserProfile(String email, UserUpdateRequest dto) {
+        User user = userRepository.findByEmailOrElseThrow(email);
 
         user.updateUserProfile(dto);
 
