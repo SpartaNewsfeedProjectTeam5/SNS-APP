@@ -5,9 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import org.example.snsapp.domain.user.dto.UserBaseResponse;
-import org.example.snsapp.domain.user.dto.UserUpdateRequest;
-import org.example.snsapp.domain.user.dto.UserUpdateResponse;
+import org.example.snsapp.domain.user.dto.*;
 import org.example.snsapp.domain.user.service.UserService;
 import org.example.snsapp.global.constant.Const;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +29,17 @@ public class UserController {
 
     @PutMapping("/users/me/profile")
     public ResponseEntity<UserUpdateResponse> updateUserProfile(
-            @Valid @RequestBody UserUpdateRequest dto,
-            @SessionAttribute(name = Const.LOGIN_USER) String email
+            @SessionAttribute(name = Const.LOGIN_USER) String email,
+            @Valid @RequestBody UserUpdateRequest dto
     ) {
         return ResponseEntity.ok(userService.updateUserProfile(email, dto));
+    }
+
+    @PutMapping("/users/me/password")
+    public ResponseEntity<UserPasswordResponse> updatePassword(
+            @SessionAttribute(name = Const.LOGIN_USER) String email,
+            @Valid @RequestBody UserPasswordRequest dto
+    ) {
+        return ResponseEntity.ok(userService.updatePassword(email, dto));
     }
 }

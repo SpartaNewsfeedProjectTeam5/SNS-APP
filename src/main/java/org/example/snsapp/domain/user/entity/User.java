@@ -57,4 +57,8 @@ public class User extends AuditableEntity {
         this.age = dto.getAge();
         this.profileImage = dto.getProfileImage();
     }
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
 }
