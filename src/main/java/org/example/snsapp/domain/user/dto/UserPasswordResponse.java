@@ -17,7 +17,7 @@ public class UserPasswordResponse {
         this.modifiedAt = modifiedAt;
     }
 
-    public static UserPasswordResponse ofSuccess(String message, LocalDateTime modifiedAt) {
+    public static UserPasswordResponse create(String message, LocalDateTime modifiedAt) {
         return new UserPasswordResponse(message, modifiedAt);
     }
 }
