@@ -29,4 +29,12 @@ public class Like extends BaseEntity {
         this.type = type;
         this.typeId = typeId;
     }
+
+    public static Like createCommentLike(User user, Long commentId) {
+        return Like.builder()
+                .user(user)
+                .type(LikeContentType.COMMENT)
+                .typeId(commentId)
+                .build();
+    }
 }
