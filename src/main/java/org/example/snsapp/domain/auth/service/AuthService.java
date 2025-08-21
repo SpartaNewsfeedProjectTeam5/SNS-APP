@@ -20,17 +20,17 @@ public class AuthService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public String login(AuthLoginRequest loginRequest) { //로그인
+    public AuthLoginResponse login(AuthLoginRequest loginRequest) { //로그인
         User user = authRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new EntityNotFoundException("없는 회원입니다."));
         Boolean isResign = authRepository.userIsResignTrue(loginRequest.getEmail());
         if (isResign) {
             throw new IllegalStateException("탈퇴한 회원입니다.");
         }
         if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            return user.getEmail();
+            return new AuthLoginResponse(user.getEmail());
         }
         throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-    } //삭제 유무 판단
+    }
 
     @Transactional //회원가입
     public AuthSignUpResponse signUp(AuthSignUpRequest signUpRequest) {
