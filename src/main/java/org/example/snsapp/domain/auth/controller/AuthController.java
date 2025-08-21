@@ -10,7 +10,6 @@ import org.example.snsapp.global.constant.Const;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.example.snsapp.domain.user.entity.User;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,16 +19,18 @@ public class AuthController {
     private final AuthService signUpService;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthLoginResponse> signIn(@Valid @RequestBody AuthLoginRequest loginRequest, HttpServletRequest request){
-        String email = signUpService.login(loginRequest);
+    public ResponseEntity<AuthLoginResponse> signIn(@Valid @RequestBody AuthLoginRequest loginRequest, HttpServletRequest request) {
+        AuthLoginResponse authLoginResponse = signUpService.login(loginRequest, request);
+        String email = authLoginResponse.getEmail();
+
         HttpSession session = request.getSession();
         session.setAttribute(Const.LOGIN_USER, email);
-        return ResponseEntity.ok(new AuthLoginResponse(email));
+        return ResponseEntity.ok().body(authLoginResponse);
     }
 
     @PostMapping("/signUp")
-    public ResponseEntity<AuthSignUpResponse> signUp (@Valid @RequestBody AuthSignUpRequest authRequest) {
-        return ResponseEntity.ok(signUpService.signUp(authRequest));
+    public AuthSignUpResponse signUp(@Valid @RequestBody AuthSignUpRequest authRequest) {
+        return signUpService.signUp(authRequest);
     }
 
     @PostMapping("/logout")
@@ -37,14 +38,14 @@ public class AuthController {
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();
-            return ResponseEntity.ok(new AuthLogoutResponse());
+            return ResponseEntity.ok().body(new AuthLogoutResponse("로그아웃이 완료 되었습니다."));
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
     @DeleteMapping("/withdrawal")
-    public ResponseEntity<AuthDeleteResponse> delete(@Valid @RequestBody AuthDeleteRequest deleteRequest) {
-        return ResponseEntity.ok(signUpService.delete(deleteRequest));
+    public void delete(@Valid @RequestBody AuthDeleteRequest deleteRequest) {
+        signUpService.delete(deleteRequest);
     }
 
 }
