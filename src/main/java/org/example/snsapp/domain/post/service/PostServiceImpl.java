@@ -17,11 +17,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
 
+/**
+ * {@link PostService}의 구현체
+ *
+ * <p>JPA를 사용하여 데이터를 데이터베이스에 저장, 조회, 수정, 삭제하는 기능 제공</p>
+ */
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+
 
     @Override
     public PostBaseResponse create(String loginUserEmail, PostBaseRequest postBaseRequest) {
