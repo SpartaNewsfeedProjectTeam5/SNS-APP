@@ -2,6 +2,7 @@ package org.example.snsapp.domain.comment.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.snsapp.domain.post.entity.Post;
@@ -21,13 +22,26 @@ public class Comment extends AuditableEntity {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @Column(name = "comment", nullable = false, length = 100)
-    private String comment;
+    @Column(name = "content", nullable = false, length = 100)
+    private String content;
 
-    public Comment(User user, Post post, String comment) {
+    @Builder
+    public Comment(User user, Post post, String content) {
         this.user = user;
         this.post = post;
-        this.comment = comment;
+        this.content = content;
     }
 
+    public static Comment createComment(User user, Post post, String content) {
+        return Comment.builder()
+                .user(user)
+                .post(post)
+                .content(content)
+                .build();
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }
+
