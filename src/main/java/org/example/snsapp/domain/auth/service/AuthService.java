@@ -4,7 +4,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.snsapp.domain.auth.dto.*;
 import org.example.snsapp.domain.auth.repository.AuthRepository;
-import org.example.snsapp.domain.user.repository.UserRepository;
+import org.example.snsapp.global.enums.ErrorCode;
+import org.example.snsapp.global.exception.CustomException;
 import org.example.snsapp.global.util.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +22,10 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public AuthLoginResponse login(AuthLoginRequest loginRequest) { //로그인
-        User user = authRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new EntityNotFoundException("없는 회원입니다."));
+        User user = authRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Boolean isResign = authRepository.userIsResignTrue(loginRequest.getEmail());
         if (isResign) {
-            throw new IllegalStateException("탈퇴한 회원입니다.");
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
         if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             return new AuthLoginResponse(user.getEmail());
@@ -36,15 +37,7 @@ public class AuthService {
     public AuthSignUpResponse signUp(AuthSignUpRequest signUpRequest) {
         Optional<User> optionalUser = authRepository.findByEmail(signUpRequest.getEmail());
         if (optionalUser.isPresent()) throw new EntityNotFoundException("이미 존재하는 사용자 아이디 입니다.");
-        User user = User.create(
-                signUpRequest.getEmail(),
-                passwordEncoder.encode(signUpRequest.getPassword()),
-                signUpRequest.getUsername(),
-                signUpRequest.getAge(),
-                false,
-                signUpRequest.getProfileImage()
-        );
-        userRepository.save(user);
+        User user = userRepository.save(new User(signUpRequest.getEmail(), passwordEncoder.encode(signUpRequest.getPassword()), signUpRequest.getUsername(), signUpRequest.getAge(), false, signUpRequest.getProfileImage()));
         return AuthSignUpResponse.create(user);
     }
 
