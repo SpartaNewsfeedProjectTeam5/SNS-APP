@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.example.snsapp.domain.auth.dto.*;
 import org.example.snsapp.domain.auth.repository.AuthRepository;
+import org.example.snsapp.domain.user.repository.UserRepository;
 import org.example.snsapp.global.constant.Const;
 import org.example.snsapp.global.util.PasswordEncoder;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public ResponseEntity<?> login(AuthLoginRequest loginRequest, HttpServletRequest request) { //로그인
-        User user = authRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new EntityNotFoundException("없는 회원입니다.") );
+        User user = authRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new EntityNotFoundException("없는 회원입니다."));
         if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             HttpSession session = request.getSession();
             session.setAttribute(Const.LOGIN_USER, user);

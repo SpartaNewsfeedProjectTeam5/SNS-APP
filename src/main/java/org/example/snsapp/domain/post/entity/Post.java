@@ -2,6 +2,7 @@ package org.example.snsapp.domain.post.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.snsapp.domain.user.entity.User;
@@ -19,6 +20,7 @@ public class Post extends AuditableEntity {
     @Column()
     private String content;
 
+    @Builder
     public Post(User user, String title, String content) {
         this.user = user;
         this.title = title;
