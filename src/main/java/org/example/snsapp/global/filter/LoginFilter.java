@@ -11,7 +11,7 @@ import org.springframework.util.PatternMatchUtils;
 import java.io.IOException;
 
 public class LoginFilter implements Filter {
-    private static final String[] WHITE_LIST = {"/", "/users/signup", "/users/login", "/users/logout"};
+    private static final String[] WHITE_LIST = {"/*", "/auth/signUp", "/users/login", "/users/logout"};
 
     @Override
     public void doFilter(ServletRequest servletRequest,

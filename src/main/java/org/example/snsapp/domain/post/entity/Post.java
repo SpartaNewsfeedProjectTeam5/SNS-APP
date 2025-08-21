@@ -17,7 +17,6 @@ public class Post extends AuditableEntity {
     private User user;
     @Column(nullable = false, length = 30)
     private String title;
-    @Column()
     private String content;
 
     @Builder

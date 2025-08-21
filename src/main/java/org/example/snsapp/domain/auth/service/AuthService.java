@@ -8,12 +8,16 @@ import org.example.snsapp.domain.auth.dto.*;
 import org.example.snsapp.domain.auth.repository.AuthRepository;
 import org.example.snsapp.domain.user.repository.UserRepository;
 import org.example.snsapp.global.constant.Const;
+import org.example.snsapp.global.enums.ErrorCode;
+import org.example.snsapp.global.exception.CustomException;
 import org.example.snsapp.global.util.PasswordEncoder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.example.snsapp.domain.user.entity.User;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,22 +27,23 @@ public class AuthService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public ResponseEntity<?> login(AuthLoginRequest loginRequest, HttpServletRequest request) { //로그인
-        User user = authRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new EntityNotFoundException("없는 회원입니다."));
-        if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            HttpSession session = request.getSession();
-            session.setAttribute(Const.LOGIN_USER, user);
-            return ResponseEntity.ok().body(new AuthLoginResponse(loginRequest.getEmail()));
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 일치하지 않습니다.");
+    public AuthLoginResponse login(AuthLoginRequest loginRequest, HttpServletRequest request) { //로그인
+
+        User user = authRepository.findByEmail(loginRequest.getEmail()).orElseThrow(
+                () -> new EntityNotFoundException("없는 회원입니다."));
+
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword()))
+            throw new CustomException(ErrorCode.AUTH_ERROR);
+
+
+        return new AuthLoginResponse(user.getEmail());
     }
 
     @Transactional //회원가입
-    public AuthSignUpResponse signUp(AuthSignUpRequest signUpRequest, HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        authRepository.findByEmail(signUpRequest.getEmail()).orElseThrow(() -> new EntityNotFoundException("이미 존재하는 사용자 아이디 입니다."));
+    public AuthSignUpResponse signUp(AuthSignUpRequest signUpRequest) {
+        Optional<User> optionalUser = authRepository.findByEmail(signUpRequest.getEmail());
+        if (optionalUser.isPresent()) throw new EntityNotFoundException("이미 존재하는 사용자 아이디 입니다.");
         User user = userRepository.save(new User(signUpRequest.getEmail(), passwordEncoder.encode(signUpRequest.getPassword()), signUpRequest.getName(), signUpRequest.getAge(), false, signUpRequest.getProfileImage()));
-        session.setAttribute(Const.LOGIN_USER, AuthSignUpResponse.create(user));
         return AuthSignUpResponse.create(user);
     }
 

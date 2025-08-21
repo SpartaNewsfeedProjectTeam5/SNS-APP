@@ -12,12 +12,12 @@ public class AuthSignUpRequest {
 
     @NotBlank(message = "이름, 나이, 아이디와 비밀번호는 필수 입력 항목입니다.")
     private String name;
-    @NotBlank (message = "이름, 나이, 아이디와 비밀번호는 필수 입력 항목입니다.")
+    @NotBlank(message = "이름, 나이, 아이디와 비밀번호는 필수 입력 항목입니다.")
     @Email(message = "올바른 아이디 형식이 아닙니다.")
     private String email;
     private int age;
     @NotBlank(message = "이름, 나이, 아이디와 비밀번호는 필수 입력 항목입니다.")
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[~!@#$%^&*()+|=])[A-Za-z\\d~!@#$%^&*()+|=]{8}$",message = "비밀번호는 8글자 이상, 대소문자, 수자, 특수문자를 각각 1글자 이상 포함해야 합니다.")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[~!@#$%^&*()+|=])[A-Za-z\\d~!@#$%^&*()+|=]{8,}$", message = "비밀번호는 8글자 이상, 대소문자, 수자, 특수문자를 각각 1글자 이상 포함해야 합니다.")
     private String password;
     @NotNull
     private String profileImage;

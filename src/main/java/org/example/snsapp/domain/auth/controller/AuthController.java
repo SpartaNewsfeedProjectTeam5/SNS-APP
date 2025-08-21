@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.snsapp.domain.auth.dto.*;
 import org.example.snsapp.domain.auth.service.AuthService;
+import org.example.snsapp.global.constant.Const;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +19,18 @@ public class AuthController {
     private final AuthService signUpService;
 
     @PostMapping("/login")
-    public ResponseEntity signIn(@Valid @RequestBody AuthLoginRequest loginRequest, HttpServletRequest request) {
-        return signUpService.login(loginRequest, request);
+    public ResponseEntity<AuthLoginResponse> signIn(@Valid @RequestBody AuthLoginRequest loginRequest, HttpServletRequest request) {
+        AuthLoginResponse authLoginResponse = signUpService.login(loginRequest, request);
+        String email = authLoginResponse.getEmail();
+
+        HttpSession session = request.getSession();
+        session.setAttribute(Const.LOGIN_USER, email);
+        return ResponseEntity.ok().body(authLoginResponse);
     }
 
     @PostMapping("/signUp")
-    public AuthSignUpResponse signUp (@Valid @RequestBody AuthSignUpRequest authRequest, HttpServletRequest request) {
-        return signUpService.signUp(authRequest, request);
+    public AuthSignUpResponse signUp(@Valid @RequestBody AuthSignUpRequest authRequest) {
+        return signUpService.signUp(authRequest);
     }
 
     @PostMapping("/logout")
