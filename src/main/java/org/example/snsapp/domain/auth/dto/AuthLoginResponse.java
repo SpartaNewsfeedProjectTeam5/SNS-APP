@@ -1,7 +1,10 @@
 package org.example.snsapp.domain.auth.dto;
 
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 
+@Getter
 public class AuthLoginResponse {
     private String message;
     private String email;

@@ -18,7 +18,7 @@ public class AuthSignUpResponse {
         return AuthSignUpResponse.builder()
                 .message("회원가입이 완료 되었습니다.")
                 .email(user.getEmail())
-                .createdAt(user.getCreatedAt())
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 }

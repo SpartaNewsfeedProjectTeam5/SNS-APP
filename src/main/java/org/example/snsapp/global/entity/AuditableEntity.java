@@ -10,5 +10,5 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 public class AuditableEntity extends BaseEntity {
     @LastModifiedDate
-    private LocalDateTime lastModified;
+    private LocalDateTime modifiedAt;
 }
