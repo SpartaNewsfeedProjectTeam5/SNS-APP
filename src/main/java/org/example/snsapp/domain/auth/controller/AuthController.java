@@ -10,7 +10,6 @@ import org.example.snsapp.global.constant.Const;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.example.snsapp.domain.user.entity.User;
 
 @RestController
 @RequiredArgsConstructor
