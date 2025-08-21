@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.example.snsapp.domain.user.dto.*;
 import org.example.snsapp.domain.user.entity.User;
 import org.example.snsapp.domain.user.repository.UserRepository;
+import org.example.snsapp.global.enums.ErrorCode;
+import org.example.snsapp.global.exception.CustomException;
 import org.example.snsapp.global.util.PasswordEncoder;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -45,11 +45,11 @@ public class UserService {
         User user = userRepository.findByEmailOrElseThrow(email);
 
         if (ObjectUtils.nullSafeEquals(dto.getCurrentPassword(), dto.getNewPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "현재 비밀번호와 동일한 비밀번호로는 변경할 수 없습니다.");
+            throw new CustomException(ErrorCode.CURRENT_PASSWORD_SAME);
         }
 
         if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "현재 비밀번호가 일치 하지 않습니다.");
+            throw new CustomException(ErrorCode.CURRENT_PASSWORD_NOT_MATCH);
         }
 
         String encodePassword = passwordEncoder.encode(dto.getNewPassword());
