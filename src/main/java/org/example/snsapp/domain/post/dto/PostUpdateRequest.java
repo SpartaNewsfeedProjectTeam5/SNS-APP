@@ -1,8 +1,10 @@
 package org.example.snsapp.domain.post.dto;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 import org.hibernate.validator.constraints.Length;
 
+@Getter
 public class PostUpdateRequest {
     @Length(max = 10, message = "제목은 10글자 이하로 입력해주세요.")
     private String title;

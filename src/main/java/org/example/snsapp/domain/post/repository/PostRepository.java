@@ -23,4 +23,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("type") String type,
             Pageable pageable
     );
+
+    Page<Post> findAllByUserEmailOrderByCreatedAtDesc(String email, Pageable pageable);
 }

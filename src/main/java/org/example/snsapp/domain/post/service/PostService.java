@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.example.snsapp.domain.post.dto.PostBaseRequest;
 import org.example.snsapp.domain.post.dto.PostBaseResponse;
 import org.example.snsapp.domain.post.dto.PostPageResponse;
+import org.example.snsapp.domain.post.dto.PostUpdateRequest;
 import org.example.snsapp.global.enums.SearchType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,8 +32,35 @@ public interface PostService {
      *
      * @param keyword    검색 키워드
      * @param searchType 검색 타입
-     * @param pageable   페이지, 사이즈, 정렬, 정렬방향을 받는 {@link Pageable} 객체.
+     * @param pageable   페이지, 사이즈, 정렬, 정렬방향을 받는 {@link Pageable} 객체
      * @return 게시물 페이지 응답 DTO의 Page
      */
     Page<PostPageResponse> search(String keyword, SearchType searchType, Pageable pageable);
+
+    /**
+     * 로그인 유저 게시물 전체 조회
+     *
+     * @param loginUserEmail 로그인 유저 이메일
+     * @param pageable       페이지, 사이즈를 받는 {@link Pageable} 객체
+     * @return 게시물 페이지 응답 DTO의 Page
+     */
+    Page<PostPageResponse> findAllByEmail(String loginUserEmail, Pageable pageable);
+
+    /**
+     * 게시물 수정
+     *
+     * @param postId            게시물 아이디
+     * @param loginUserEmail    로그인 유저 이메일
+     * @param postUpdateRequest 게시물 수정 요청 DTO
+     * @return 게시물 페이지 응답 DTO
+     */
+    PostBaseResponse update(Long postId, String loginUserEmail, @Valid PostUpdateRequest postUpdateRequest);
+
+    /**
+     * 게시물 삭제
+     *
+     * @param postId         게시물 아이디
+     * @param loginUserEmail 로그인 유저 이메일
+     */
+    void delete(Long postId, String loginUserEmail);
 }

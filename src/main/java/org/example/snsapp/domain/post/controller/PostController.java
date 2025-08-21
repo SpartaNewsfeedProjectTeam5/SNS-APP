@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.snsapp.domain.post.dto.PostBaseRequest;
 import org.example.snsapp.domain.post.dto.PostBaseResponse;
 import org.example.snsapp.domain.post.dto.PostPageResponse;
+import org.example.snsapp.domain.post.dto.PostUpdateRequest;
 import org.example.snsapp.domain.post.service.PostService;
 import org.example.snsapp.global.enums.ErrorCode;
 import org.example.snsapp.global.enums.SearchType;
@@ -36,7 +37,7 @@ public class PostController {
      *
      * @param postBaseRequest 게시물 기본 요청 DTO
      * @param request         HTTP 요청 정보
-     * @return HTTP 상태 코드와 일정 기본 응답 DTO
+     * @return HTTP 상태 코드와 게시물 기본 응답 DTO
      */
     @PostMapping("/api/v1/posts")
     public ResponseEntity<PostBaseResponse> create(@Valid @RequestBody PostBaseRequest postBaseRequest,
@@ -70,4 +71,63 @@ public class PostController {
         return new ResponseEntity<>(postPageResponse.getContent(), HttpStatus.OK);
     }
 
+    /**
+     * 로그인 유저 게시물 조회
+     *
+     * @param pageable 페이지, 사이즈를 받는 {@link Pageable} 객체
+     * @param request  HTTP 요청 정보
+     * @return HTTP 상태 코드와 게시물 페이지 응답 DTO의 List
+     */
+    @GetMapping("/api/v1/posts/myposts")
+    public ResponseEntity<List<PostPageResponse>> findAllBySessionEmail(@PageableDefault(
+                                                                                page = 0,
+                                                                                size = 10) Pageable pageable,
+                                                                        HttpServletRequest request) {
+        String loginUserEmail = getSessionEmail(request);
+
+        Page<PostPageResponse> postPageResponse = postService.findAllByEmail(loginUserEmail, pageable);
+
+        return new ResponseEntity<>(postPageResponse.getContent(), HttpStatus.OK);
+    }
+
+    /**
+     * 게시물 수정
+     *
+     * @param postId            게시물 아이디
+     * @param postUpdateRequest 게시물 수정 요청 DTO
+     * @param request           HTTP 요청 정보
+     * @return HTTP 상태 코드와 게시물 기본 응답 DTO
+     */
+    @PutMapping("/api/v1/posts/{postId}")
+    public ResponseEntity<PostBaseResponse> update(@PathVariable Long postId,
+                                                   @Valid @RequestBody PostUpdateRequest postUpdateRequest,
+                                                   HttpServletRequest request) {
+        String loginUserEmail = getSessionEmail(request);
+
+        PostBaseResponse postBaseResponse = postService.update(postId, loginUserEmail, postUpdateRequest);
+
+        return new ResponseEntity<>(postBaseResponse, HttpStatus.OK);
+    }
+
+    /**
+     * 게시물 삭제
+     *
+     * @param postId  게시물 아이디
+     * @param request HTTP 요청 정보
+     * @return HTTP 상태 코드
+     */
+    @DeleteMapping("/api/v1/posts/{postId}")
+    public ResponseEntity<Void> delete(@PathVariable Long postId,
+                                       HttpServletRequest request) {
+        String loginUserEmail = getSessionEmail(request);
+
+        postService.delete(postId, loginUserEmail);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    String getSessionEmail(HttpServletRequest request) {
+        return SessionUtils.getLoginUserEmailByServlet(request).
+                orElseThrow(() -> new CustomException(ErrorCode.NEED_AUTH));
+    }
 }
