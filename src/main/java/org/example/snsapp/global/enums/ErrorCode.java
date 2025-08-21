@@ -27,6 +27,8 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USR-003", "유저를 찾을 수 없습니다."),
     NEED_AUTH(HttpStatus.UNAUTHORIZED, "USR-004", "로그인이 필요한 서비스 입니다."),
     NO_PERMISSION(HttpStatus.FORBIDDEN, "USR-005", "권한이 없어 요청을 수행할 수 없습니다."),
+    CURRENT_PASSWORD_SAME(HttpStatus.BAD_REQUEST, "USR-006", "현재 비밀번호와 동일한 비밀번호로는 변경할 수 없습니다."),
+    CURRENT_PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "USR-007", "현재 비밀번호가 일치하지 않습니다."),
 
     // 좋아요 관련
     ALREADY_LIKED(HttpStatus.CONFLICT, "LIKE-001", "이미 좋아요를 눌렀습니다."),
