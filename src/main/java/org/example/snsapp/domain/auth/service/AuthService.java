@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.snsapp.domain.auth.dto.*;
 import org.example.snsapp.domain.auth.repository.AuthRepository;
+import org.example.snsapp.domain.user.repository.UserRepository;
 import org.example.snsapp.global.util.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

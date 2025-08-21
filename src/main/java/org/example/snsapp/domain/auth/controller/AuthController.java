@@ -20,7 +20,7 @@ public class AuthController {
     private final AuthService signUpService;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthLoginResponse> signIn(@Valid @RequestBody AuthLoginRequest loginRequest, HttpServletRequest request){
+    public ResponseEntity<AuthLoginResponse> signIn(@Valid @RequestBody AuthLoginRequest loginRequest, HttpServletRequest request) {
         String email = signUpService.login(loginRequest);
         HttpSession session = request.getSession();
         session.setAttribute(Const.LOGIN_USER, email);
@@ -28,7 +28,7 @@ public class AuthController {
     }
 
     @PostMapping("/signUp")
-    public ResponseEntity<AuthSignUpResponse> signUp (@Valid @RequestBody AuthSignUpRequest authRequest) {
+    public ResponseEntity<AuthSignUpResponse> signUp(@Valid @RequestBody AuthSignUpRequest authRequest) {
         return ResponseEntity.ok(signUpService.signUp(authRequest));
     }
 
@@ -48,4 +48,3 @@ public class AuthController {
     }
 
 }
-
