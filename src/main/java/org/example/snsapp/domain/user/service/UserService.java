@@ -1,19 +1,22 @@
 package org.example.snsapp.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.snsapp.domain.user.dto.UserBaseResponse;
-import org.example.snsapp.domain.user.dto.UserUpdateRequest;
-import org.example.snsapp.domain.user.dto.UserUpdateResponse;
+import org.example.snsapp.domain.user.dto.*;
 import org.example.snsapp.domain.user.entity.User;
 import org.example.snsapp.domain.user.repository.UserRepository;
+import org.example.snsapp.global.util.PasswordEncoder;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public UserBaseResponse getUserProfile(String email) {
@@ -35,5 +38,25 @@ public class UserService {
 
         // TODO: followerCount, followingCount는 팔로우 기능 구현 후 실제 값으로 변경
         return UserUpdateResponse.create(user);
+    }
+
+    @Transactional
+    public UserPasswordResponse updatePassword(String email, UserPasswordRequest dto) {
+        User user = userRepository.findByEmailOrElseThrow(email);
+
+        if (ObjectUtils.nullSafeEquals(dto.getCurrentPassword(), dto.getNewPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "현재 비밀번호와 동일한 비밀번호로는 변경할 수 없습니다.");
+        }
+
+        if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "현재 비밀번호가 일치 하지 않습니다.");
+        }
+
+        String encodePassword = passwordEncoder.encode(dto.getNewPassword());
+        user.updatePassword(encodePassword);
+        // 수정 후 DTO를 바로 반환하기 위해 강제로 DB에 반영
+        userRepository.saveAndFlush(user);
+
+        return UserPasswordResponse.ofSuccess("비밀번호가 성공적으로 변경 되었습니다.", user.getModifiedAt());
     }
 }
