@@ -1,6 +1,9 @@
 package org.example.snsapp.domain.user.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.example.snsapp.domain.user.dto.UserBaseResponse;
 import org.example.snsapp.domain.user.dto.UserUpdateRequest;
@@ -16,8 +19,12 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/users/{email}/profile")
-    public ResponseEntity<UserBaseResponse> getUserProfile(@PathVariable String email) {
+    @GetMapping("/users/profile")
+    public ResponseEntity<UserBaseResponse> getUserProfile(
+            @RequestParam
+            @Email(message = "올바른 이메일 형식이 아닙니다.")
+            @Size(max = 40, message = "40자 이내로 입력해주세요.") String email
+    ) {
         return ResponseEntity.ok(userService.getUserProfile(email));
     }
 
