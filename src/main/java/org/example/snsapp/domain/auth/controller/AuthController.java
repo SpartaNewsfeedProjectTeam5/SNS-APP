@@ -14,25 +14,24 @@ import org.example.snsapp.domain.user.entity.User;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
+@RequestMapping("/api")
 public class AuthController {
 
     private final AuthService signUpService;
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthLoginResponse> signIn(@Valid @RequestBody AuthLoginRequest loginRequest, HttpServletRequest request) {
-        String email = signUpService.login(loginRequest);
-        HttpSession session = request.getSession();
-        session.setAttribute(Const.LOGIN_USER, email);
-        return ResponseEntity.ok(new AuthLoginResponse(email));
+    @PostMapping("/v1/auth/login")
+    public ResponseEntity<AuthLoginResponse> signIn(@Valid @RequestBody AuthLoginRequest loginRequest, HttpServletRequest request){
+        AuthLoginResponse auth = signUpService.login(loginRequest);
+        request.getSession().setAttribute(Const.LOGIN_USER, auth.getEmail());
+        return ResponseEntity.ok(auth);
     }
 
-    @PostMapping("/signUp")
-    public ResponseEntity<AuthSignUpResponse> signUp(@Valid @RequestBody AuthSignUpRequest authRequest) {
+    @PostMapping("/v1/auth/signUp")
+    public ResponseEntity<AuthSignUpResponse> signUp (@Valid @RequestBody AuthSignUpRequest authRequest) {
         return ResponseEntity.ok(signUpService.signUp(authRequest));
     }
 
-    @PostMapping("/logout")
+    @PostMapping("/v1/auth/logout")
     public ResponseEntity<AuthLogoutResponse> logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null) {
@@ -42,9 +41,10 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
-    @DeleteMapping("/withdrawal")
+    @DeleteMapping("/v1/auth/withdrawal")
     public ResponseEntity<AuthDeleteResponse> delete(@Valid @RequestBody AuthDeleteRequest deleteRequest) {
         return ResponseEntity.ok(signUpService.delete(deleteRequest));
     }
 
 }
+
