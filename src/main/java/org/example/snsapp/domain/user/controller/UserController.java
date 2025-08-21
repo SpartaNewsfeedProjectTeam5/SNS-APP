@@ -12,13 +12,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/newsfeeds/v1")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/users/profile")
+    @GetMapping("/v1/users/profile")
     public ResponseEntity<UserBaseResponse> getUserProfile(
             @RequestParam
             @Email(message = "올바른 이메일 형식이 아닙니다.")
@@ -27,7 +27,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserProfile(email));
     }
 
-    @PutMapping("/users/me/profile")
+    @PutMapping("/v1/users/me/profile")
     public ResponseEntity<UserUpdateResponse> updateUserProfile(
             @SessionAttribute(name = Const.LOGIN_USER) String email,
             @Valid @RequestBody UserUpdateRequest dto
@@ -35,7 +35,7 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUserProfile(email, dto));
     }
 
-    @PutMapping("/users/me/password")
+    @PutMapping("/v1/users/me/password")
     public ResponseEntity<UserPasswordResponse> updatePassword(
             @SessionAttribute(name = Const.LOGIN_USER) String email,
             @Valid @RequestBody UserPasswordRequest dto
