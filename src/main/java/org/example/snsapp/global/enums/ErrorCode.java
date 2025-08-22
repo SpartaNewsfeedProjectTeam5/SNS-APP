@@ -36,7 +36,6 @@ public enum ErrorCode {
     ALREADY_LIKED(HttpStatus.CONFLICT, "LIKE-001", "이미 좋아요를 눌렀습니다."),
     LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "LIKE-002", "좋아요를 누르지 않았습니다.");
 
-
     private final HttpStatus status;
     private final String code;
     private final String message;
