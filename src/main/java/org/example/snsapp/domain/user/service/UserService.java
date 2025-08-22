@@ -1,6 +1,7 @@
 package org.example.snsapp.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.snsapp.domain.follow.service.FollowDomainService;
 import org.example.snsapp.domain.user.dto.*;
 import org.example.snsapp.domain.user.entity.User;
 import org.example.snsapp.domain.user.repository.UserRepository;
@@ -17,17 +18,20 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FollowDomainService followDomainService;
 
     @Transactional(readOnly = true)
-    public UserBaseResponse getUserProfile(String email) {
+    public UserProfileResponse getUserProfile(String email) {
         User user = userRepository.findByEmailOrElseThrow(email);
 
-        // TODO: followerCount, followingCount는 팔로우 기능 구현 후 실제 값으로 변경
-        return UserBaseResponse.create(user, 0, 0);
+        int followerCount = followDomainService.getFollowerCount(user.getId());
+        int followingCount = followDomainService.getFollowingCount(user.getId());
+
+        return UserProfileResponse.create(user, followerCount, followingCount);
     }
 
     @Transactional
-    public UserUpdateResponse updateUserProfile(String email, UserUpdateRequest dto) {
+    public UserProfileResponse updateUserProfile(String email, UserUpdateRequest dto) {
         User user = userRepository.findByEmailOrElseThrow(email);
 
         user.updateUserProfile(dto);
@@ -36,8 +40,10 @@ public class UserService {
         // @LastModifiedDate 같은 Auditing 필드가 DTO에 반영되도록 flush 필요
         userRepository.saveAndFlush(user);
 
-        // TODO: followerCount, followingCount는 팔로우 기능 구현 후 실제 값으로 변경
-        return UserUpdateResponse.create(user);
+        int followerCount = followDomainService.getFollowerCount(user.getId());
+        int followingCount = followDomainService.getFollowingCount(user.getId());
+
+        return UserProfileResponse.createForUpdate(user, followerCount, followingCount);
     }
 
     @Transactional

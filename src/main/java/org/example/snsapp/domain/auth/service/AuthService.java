@@ -29,14 +29,22 @@ public class AuthService {
         if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             return new AuthLoginResponse(user.getEmail());
         }
-        throw new CustomException(ErrorCode.CURRENT_PASSWORD_NOT_MATCH);
+        throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
     }
 
     @Transactional //회원가입
     public AuthSignUpResponse signUp(AuthSignUpRequest signUpRequest) {
         Optional<User> optionalUser = authRepository.findByEmail(signUpRequest.getEmail());
         if (optionalUser.isPresent()) throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
-        User user = userRepository.save(new User(signUpRequest.getEmail(), passwordEncoder.encode(signUpRequest.getPassword()), signUpRequest.getUsername(), signUpRequest.getAge(), false, signUpRequest.getProfileImage()));
+        User user = User.create(
+                signUpRequest.getEmail(),
+                passwordEncoder.encode(signUpRequest.getPassword()),
+                signUpRequest.getUsername(),
+                signUpRequest.getAge(),
+                false,
+                signUpRequest.getProfileImage()
+        );
+        userRepository.save(user);
         return AuthSignUpResponse.create(user);
     }
 
