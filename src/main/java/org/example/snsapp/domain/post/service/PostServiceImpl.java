@@ -1,6 +1,7 @@
 package org.example.snsapp.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.snsapp.domain.follow.service.FollowService;
 import org.example.snsapp.domain.like.service.LikeService;
 import org.example.snsapp.domain.notification.service.NotificationService;
 import org.example.snsapp.domain.post.dto.PostRequest;
@@ -9,6 +10,7 @@ import org.example.snsapp.domain.post.entity.Post;
 import org.example.snsapp.domain.post.repository.PostRepository;
 import org.example.snsapp.domain.user.entity.User;
 import org.example.snsapp.domain.user.service.UserDomainService;
+import org.example.snsapp.domain.user.service.UserService;
 import org.example.snsapp.global.enums.ErrorCode;
 import org.example.snsapp.global.enums.LikeContentType;
 import org.example.snsapp.global.enums.NotificationContentType;
@@ -19,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -34,6 +37,7 @@ public class PostServiceImpl implements PostService {
     private final LikeService likeService;
     private final UserDomainService userDomainService;
     private final NotificationService notificationService;
+    private final FollowService followService;
 
     @Transactional
     @Override
@@ -67,6 +71,17 @@ public class PostServiceImpl implements PostService {
 
         return postPage.map(PostResponse::create);
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<PostResponse> findAllByFollowingUser(String loginUserEmail, Pageable pageable) {
+        Long userId = userDomainService.getUserByEmail(loginUserEmail).getId();
+        List<User> followingUsers = followService.getFollowingUsersByUserId(userId);
+        Page<Post> postPage = postRepository.findByUserIn(followingUsers, pageable);
+
+        return postPage.map(PostResponse::create);
+    }
+
 
     @Transactional
     @Override

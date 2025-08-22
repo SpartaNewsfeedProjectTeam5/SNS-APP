@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class FollowService {
@@ -58,6 +61,12 @@ public class FollowService {
         Page<FollowerDto> followPage = followRepository.findFollowerByUserId(userId, pageable);
 
         return FollowerResponse.create(followPage);
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> getFollowingUsersByUserId(Long userId) {
+        List<Follow> follows = followRepository.findAllByFollowerId(userId);
+        return follows.stream().map(Follow::getFollowing).toList();
     }
 
     private FollowIds validateFollowAction(String loginEmail, String targetEmail, boolean isFollow) {

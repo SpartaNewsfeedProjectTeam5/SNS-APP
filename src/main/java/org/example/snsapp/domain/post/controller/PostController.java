@@ -95,6 +95,28 @@ public class PostController {
     }
 
     /**
+     * 팔로잉 유저 게시물 조회
+     *
+     * @param pageable 페이지, 사이즈, 정렬, 정렬방향을 받는 {@link Pageable} 객체.
+     * @param request  HTTP 요청 정보
+     * @return HTTP 상태 코드와 게시물 페이지 응답 DTO의 List
+     */
+    @GetMapping("v1/posts/followings")
+    public ResponseEntity<List<PostResponse>> findAllByFollowingUser(
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC) Pageable pageable,
+            HttpServletRequest request) {
+        String loginUserEmail = getSessionEmail(request);
+
+        Page<PostResponse> postResponse = postService.findAllByFollowingUser(loginUserEmail, pageable);
+
+        return new ResponseEntity<>(postResponse.getContent(), HttpStatus.OK);
+    }
+
+    /**
      * 게시물 수정
      *
      * @param postId      게시물 아이디
