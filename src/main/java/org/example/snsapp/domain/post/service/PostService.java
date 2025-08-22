@@ -43,6 +43,15 @@ public interface PostService {
     Page<PostResponse> findAllByEmail(String loginUserEmail, Pageable pageable);
 
     /**
+     * 팔로잉 유저 게시물 전체 조회
+     *
+     * @param loginUserEmail 로그인 유저 이메일
+     * @param pageable       페이지, 사이즈를 받는 {@link Pageable} 객체
+     * @return 게시물 페이지 응답 DTO의 Page
+     */
+    Page<PostResponse> findAllByFollowingUser(String loginUserEmail, Pageable pageable);
+
+    /**
      * 게시물 수정
      *
      * @param postId         게시물 아이디
@@ -60,7 +69,20 @@ public interface PostService {
      */
     void delete(Long postId, String loginUserEmail);
 
+    /**
+     * 좋아요 생성
+     *
+     * @param postId         게시물 아이디
+     * @param loginUserEmail 로그인 유저 이메일
+     * @return 게시물 기본 응답 DTO
+     */
     PostResponse addLike(Long postId, String loginUserEmail);
 
+    /**
+     * 좋아요 제거
+     *
+     * @param postId         게시물 아이디
+     * @param loginUserEmail 로그인 유저 이메일
+     */
     void removeLike(Long postId, String loginUserEmail);
 }
