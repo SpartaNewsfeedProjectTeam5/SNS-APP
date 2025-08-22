@@ -10,9 +10,11 @@ import java.util.Optional;
 
 // 좋아요 레포지토리
 public interface LikeRepository extends JpaRepository<Like, Long> {
-    boolean existsByUserAndTypeAndTypeId(User user, LikeContentType type, Long typeId);
-
     Optional<Like> findByUserAndTypeAndTypeId(User user, LikeContentType type, Long typeId);
+
+    void deleteByUserAndTypeAndTypeId(User user, LikeContentType type, Long typeId);
+
+    boolean existsByUserAndTypeAndTypeId(User user, LikeContentType type, Long typeId);
 
     List<Like> findLikesByUser(User user);
 }

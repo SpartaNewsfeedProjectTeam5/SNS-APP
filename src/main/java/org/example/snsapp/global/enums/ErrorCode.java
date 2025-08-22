@@ -19,8 +19,8 @@ public enum ErrorCode {
 
     // 댓글 관련
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "CMT-001", "댓글을 찾을 수 없습니다."),
-    COMMENT_LIKE_PERMISSION_ERROR(HttpStatus.FORBIDDEN, "CMT-002", "자신의 댓글에는 좋아요를 누를 수 없습니다.."),
-    COMMENT_FORBIDDEN(HttpStatus.FORBIDDEN, "CMT-003", "댓글에 대한 권한이 없습니다."),
+    COMMENT_FORBIDDEN(HttpStatus.FORBIDDEN, "CMT-002", "댓글에 대한 권한이 없습니다."),
+    COMMENT_LIKE_PERMISSION_ERROR(HttpStatus.FORBIDDEN, "CMT-003", "자신의 댓글에는 좋아요를 누를 수 없습니다.."),
 
     // 유저 관련
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "USR-001", "이미 가입된 이메일입니다."),
@@ -35,6 +35,7 @@ public enum ErrorCode {
     // 좋아요 관련
     ALREADY_LIKED(HttpStatus.CONFLICT, "LIKE-001", "이미 좋아요를 눌렀습니다."),
     LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "LIKE-002", "좋아요를 누르지 않았습니다.");
+
 
     private final HttpStatus status;
     private final String code;
