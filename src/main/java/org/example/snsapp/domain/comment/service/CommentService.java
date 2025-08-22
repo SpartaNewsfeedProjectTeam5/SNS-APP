@@ -128,10 +128,6 @@ public class CommentService {
         User user = findUserByEmail(userEmail);
         Comment comment = findCommentById(commentId);
 
-        // 자기 댓글에 좋아요 금지
-        if(MatchAuthorEmail(comment,userEmail))
-            throw new CustomException(ErrorCode.COMMENT_LIKE_PERMISSION_ERROR);
-
         // 좋아요 존재 여부 체크
         if (likeRepository.findByUserAndTypeAndTypeId(user, LikeContentType.COMMENT, commentId).isEmpty()) {
             throw new CustomException(ErrorCode.LIKE_NOT_FOUND);
@@ -197,5 +193,9 @@ public class CommentService {
         if (!comment.getUser().getEmail().equals(userEmail)) {
             throw new CustomException(ErrorCode.COMMENT_FORBIDDEN);
         }
+    }
+
+    private boolean MatchAuthorEmail(Comment comment, String userEmail) {
+        return Objects.equals(comment.getUser().getEmail(), userEmail);
     }
 }
