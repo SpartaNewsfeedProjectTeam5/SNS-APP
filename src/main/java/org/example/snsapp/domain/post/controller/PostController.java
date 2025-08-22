@@ -3,16 +3,16 @@ package org.example.snsapp.domain.post.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.snsapp.domain.post.dto.PostBaseRequest;
-import org.example.snsapp.domain.post.dto.PostBaseResponse;
-import org.example.snsapp.domain.post.dto.PostPageResponse;
-import org.example.snsapp.domain.post.dto.PostUpdateRequest;
+import org.example.snsapp.domain.post.dto.PostRequest;
+import org.example.snsapp.domain.post.dto.PostResponse;
+import org.example.snsapp.domain.post.entity.Post;
 import org.example.snsapp.domain.post.service.PostService;
 import org.example.snsapp.global.enums.ErrorCode;
 import org.example.snsapp.global.enums.SearchType;
 import org.example.snsapp.global.exception.CustomException;
 import org.example.snsapp.global.util.SessionUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -35,19 +35,20 @@ public class PostController {
     /**
      * 새로운 게시물 생성
      *
-     * @param postBaseRequest 게시물 기본 요청 DTO
-     * @param request         HTTP 요청 정보
+     * @param postRequest 게시물 기본 요청 DTO
+     * @param request     HTTP 요청 정보
      * @return HTTP 상태 코드와 게시물 기본 응답 DTO
      */
     @PostMapping("/api/v1/posts")
-    public ResponseEntity<PostBaseResponse> create(@Valid @RequestBody PostBaseRequest postBaseRequest,
-                                                   HttpServletRequest request) {
+    public ResponseEntity<PostResponse> create(
+            @Valid @RequestBody PostRequest postRequest,
+            HttpServletRequest request) {
         // 로그인 유저 이메일 확인
         String loginUserEmail = SessionUtils.getLoginUserEmailByServlet(request).orElseThrow(
                 () -> new CustomException(ErrorCode.NEED_AUTH)
         );
 
-        return new ResponseEntity<>(postService.create(loginUserEmail, postBaseRequest), HttpStatus.CREATED);
+        return new ResponseEntity<>(postService.create(loginUserEmail, postRequest), HttpStatus.CREATED);
     }
 
     /**
@@ -59,54 +60,59 @@ public class PostController {
      * @return HTTP 상태 코드와 게시물 페이지 응답 DTO의 List
      */
     @GetMapping("/api/v1/posts/search")
-    public ResponseEntity<List<PostPageResponse>> search(@RequestParam String keyword,
-                                                         @RequestParam SearchType searchType,
-                                                         @PageableDefault(
-                                                                 page = 0,
-                                                                 size = 10,
-                                                                 sort = "createAt",
-                                                                 direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<PostPageResponse> postPageResponse = postService.search(keyword, searchType, pageable);
+    public ResponseEntity<List<PostResponse>> search(
+            @RequestParam String keyword,
+            @RequestParam SearchType searchType,
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<PostResponse> postResponse = postService.search(keyword, searchType, pageable);
 
-        return new ResponseEntity<>(postPageResponse.getContent(), HttpStatus.OK);
+        return new ResponseEntity<>(postResponse.getContent(), HttpStatus.OK);
     }
 
     /**
      * 로그인 유저 게시물 조회
      *
-     * @param pageable 페이지, 사이즈를 받는 {@link Pageable} 객체
+     * @param pageable 페이지, 사이즈, 정렬, 정렬방향을 받는 {@link Pageable} 객체.
      * @param request  HTTP 요청 정보
      * @return HTTP 상태 코드와 게시물 페이지 응답 DTO의 List
      */
     @GetMapping("/api/v1/posts/myposts")
-    public ResponseEntity<List<PostPageResponse>> findAllBySessionEmail(@PageableDefault(
-                                                                                page = 0,
-                                                                                size = 10) Pageable pageable,
-                                                                        HttpServletRequest request) {
+    public ResponseEntity<List<PostResponse>> findAllBySessionEmail(
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC) Pageable pageable
+            , HttpServletRequest request) {
         String loginUserEmail = getSessionEmail(request);
 
-        Page<PostPageResponse> postPageResponse = postService.findAllByEmail(loginUserEmail, pageable);
+        Page<PostResponse> postResponse = postService.findAllByEmail(loginUserEmail, pageable);
 
-        return new ResponseEntity<>(postPageResponse.getContent(), HttpStatus.OK);
+        return new ResponseEntity<>(postResponse.getContent(), HttpStatus.OK);
     }
 
     /**
      * 게시물 수정
      *
-     * @param postId            게시물 아이디
-     * @param postUpdateRequest 게시물 수정 요청 DTO
-     * @param request           HTTP 요청 정보
+     * @param postId      게시물 아이디
+     * @param postRequest 게시물 수정 요청 DTO
+     * @param request     HTTP 요청 정보
      * @return HTTP 상태 코드와 게시물 기본 응답 DTO
      */
     @PutMapping("/api/v1/posts/{postId}")
-    public ResponseEntity<PostBaseResponse> update(@PathVariable Long postId,
-                                                   @Valid @RequestBody PostUpdateRequest postUpdateRequest,
-                                                   HttpServletRequest request) {
+    public ResponseEntity<PostResponse> update(
+            @PathVariable Long postId,
+            @Valid @RequestBody PostRequest postRequest,
+            HttpServletRequest request) {
         String loginUserEmail = getSessionEmail(request);
 
-        PostBaseResponse postBaseResponse = postService.update(postId, loginUserEmail, postUpdateRequest);
+        PostResponse postResponse = postService.update(postId, loginUserEmail, postRequest);
 
-        return new ResponseEntity<>(postBaseResponse, HttpStatus.OK);
+        return new ResponseEntity<>(postResponse, HttpStatus.OK);
     }
 
     /**
@@ -126,6 +132,45 @@ public class PostController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    /**
+     * 게시물 좋아요 생성
+     *
+     * @param postId  게시물 아이디
+     * @param request HTTP 요청 정보
+     * @return HTTP 상태 코드와 게시물 기본 응답 DTO
+     */
+    @PostMapping("/api/v1/posts/{postId}/likes")
+    public ResponseEntity<PostResponse> addLike(
+            @PathVariable Long postId,
+            HttpServletRequest request) {
+        String loginUserEmail = getSessionEmail(request);
+
+        return ResponseEntity.ok(postService.addLike(postId, loginUserEmail));
+    }
+
+    /**
+     * 게시물 좋아요 삭제
+     *
+     * @param postId
+     * @param request
+     * @return
+     */
+    @DeleteMapping("/api/v1/posts/{postId}/likes")
+    public ResponseEntity<Void> removeLike(
+            @PathVariable Long postId,
+            HttpServletRequest request) {
+        String loginUserEmail = getSessionEmail(request);
+        postService.removeLike(postId, loginUserEmail);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    /**
+     * HTTPServlet 으로부터 이메일을 받아온다.
+     *
+     * @param request HTTP 요청 정보
+     * @return 이메일
+     */
     String getSessionEmail(HttpServletRequest request) {
         return SessionUtils.getLoginUserEmailByServlet(request).
                 orElseThrow(() -> new CustomException(ErrorCode.NEED_AUTH));

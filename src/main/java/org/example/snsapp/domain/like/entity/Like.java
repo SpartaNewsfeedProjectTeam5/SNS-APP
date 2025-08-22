@@ -2,6 +2,7 @@ package org.example.snsapp.domain.like.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.snsapp.domain.user.entity.User;
@@ -22,6 +23,7 @@ public class Like extends BaseEntity {
     @Column(name = "type_id", nullable = false)
     private Long typeId;
 
+    @Builder
     public Like(User user, LikeContentType type, Long typeId) {
         this.user = user;
         this.type = type;
