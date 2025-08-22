@@ -137,14 +137,4 @@ public class PostServiceImpl implements PostService {
     private boolean MatchAuthorEmail(Post post, String email) {
         return Objects.equals(post.getUser().getEmail(), email);
     }
-
-    /**
-     * 게시글 ID로 게시글 조회
-     */
-    @Transactional(readOnly = true)
-    @Override
-    public Post findPostById(Long postId) {
-        return postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
-    }
 }
