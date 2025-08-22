@@ -1,15 +1,15 @@
 package org.example.snsapp.domain.follow.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.snsapp.domain.follow.dto.FollowActionResponse;
-import org.example.snsapp.domain.follow.dto.FollowIds;
-import org.example.snsapp.domain.follow.dto.FollowRequest;
+import org.example.snsapp.domain.follow.dto.*;
 import org.example.snsapp.domain.follow.entity.Follow;
 import org.example.snsapp.domain.follow.repository.FollowRepository;
 import org.example.snsapp.domain.user.entity.User;
 import org.example.snsapp.domain.user.service.UserDomainService;
 import org.example.snsapp.global.enums.ErrorCode;
 import org.example.snsapp.global.exception.CustomException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -43,6 +43,15 @@ public class FollowService {
         followRepository.deleteByFollowerIdAndFollowingId(followIds.getFollowerId(), followIds.getFollowingId());
 
         return FollowActionResponse.ofUnfollow("언팔로우가 완료되었습니다");
+    }
+
+    @Transactional(readOnly = true)
+    public FollowerResponse findFollowers(String email, Pageable pageable) {
+        Long userId = userDomainService.getUserIdByEmail(email).getId();
+
+        Page<FollowerDto> followPage = followRepository.findFollowerByUserId(userId, pageable);
+
+        return FollowerResponse.create(followPage);
     }
 
     private FollowIds validateFollowAction(String loginEmail, String targetEmail, boolean isFollow) {
