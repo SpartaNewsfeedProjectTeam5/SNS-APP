@@ -31,7 +31,7 @@ public class LikeServiceImpl implements LikeService {
     @Override
     public void addLike(User user, LikeContentType type, Long typeId) {
         // 중복 검사
-        if (likeRepository.existsByUserAndTypeAndTypeId(user, type, typeId))
+        if (existsByUserAndTypeAndTypeId(user, type, typeId))
             throw new CustomException(ErrorCode.ALREADY_LIKED);
 
         Like like = Like.builder()
@@ -53,4 +53,9 @@ public class LikeServiceImpl implements LikeService {
     }
 
 
+    @Transactional(readOnly = true)
+    @Override
+    public boolean existsByUserAndTypeAndTypeId(User user, LikeContentType type, Long typeId) {
+        return likeRepository.existsByUserAndTypeAndTypeId(user, type, typeId);
+    }
 }

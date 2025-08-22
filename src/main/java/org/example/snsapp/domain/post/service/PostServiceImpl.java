@@ -2,14 +2,16 @@ package org.example.snsapp.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.snsapp.domain.like.service.LikeService;
+import org.example.snsapp.domain.notification.service.NotificationService;
 import org.example.snsapp.domain.post.dto.PostRequest;
 import org.example.snsapp.domain.post.dto.PostResponse;
 import org.example.snsapp.domain.post.entity.Post;
 import org.example.snsapp.domain.post.repository.PostRepository;
 import org.example.snsapp.domain.user.entity.User;
-import org.example.snsapp.domain.user.repository.UserRepository;
+import org.example.snsapp.domain.user.service.UserDomainService;
 import org.example.snsapp.global.enums.ErrorCode;
 import org.example.snsapp.global.enums.LikeContentType;
+import org.example.snsapp.global.enums.NotificationContentType;
 import org.example.snsapp.global.enums.SearchType;
 import org.example.snsapp.global.exception.CustomException;
 import org.springframework.data.domain.Page;
@@ -30,13 +32,13 @@ import java.util.Optional;
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final LikeService likeService;
-    private final UserRepository userRepository;
-
+    private final UserDomainService userDomainService;
+    private final NotificationService notificationService;
 
     @Transactional
     @Override
     public PostResponse create(String loginUserEmail, PostRequest postRequest) {
-        User user = userRepository.findByEmailOrElseThrow(loginUserEmail);
+        User user = userDomainService.getUserByEmail(loginUserEmail);
 
         Post post = Post.builder()
                 .user(user)
@@ -104,10 +106,13 @@ public class PostServiceImpl implements PostService {
         if (MatchAuthorEmail(post, loginUserEmail))
             throw new CustomException(ErrorCode.POST_LIKE_PERMISSION_ERROR);
 
-        User user = userRepository.findByEmailOrElseThrow(loginUserEmail);
+        User user = userDomainService.getUserByEmail(loginUserEmail);
 
         likeService.addLike(user, LikeContentType.POST, postId);
         post.increaseLikeCount();
+
+        // 알람 생성
+        createPostLikeNotification(user, post);
 
         return PostResponse.create(post);
     }
@@ -121,7 +126,7 @@ public class PostServiceImpl implements PostService {
         if (MatchAuthorEmail(post, loginUserEmail))
             throw new CustomException(ErrorCode.POST_LIKE_PERMISSION_ERROR);
 
-        User user = userRepository.findByEmailOrElseThrow(loginUserEmail);
+        User user = userDomainService.getUserByEmail(loginUserEmail);
 
         likeService.removeLike(user, LikeContentType.POST, postId);
         post.decreaseLikeCount();
@@ -136,5 +141,23 @@ public class PostServiceImpl implements PostService {
      */
     private boolean MatchAuthorEmail(Post post, String email) {
         return Objects.equals(post.getUser().getEmail(), email);
+    }
+
+    /**
+     * 게시글 좋아요 알람 생성
+     *
+     * @param from 보내는 유저
+     * @param post 게시글 엔티티
+     */
+    private void createPostLikeNotification(User from, Post post) {
+        String message = from.getUsername() + "님이 " + post.getTitle() + " 게시글에 좋아요를 남기셨습니다.";
+
+        notificationService.create(
+                from,
+                post.getUser(),
+                NotificationContentType.LIKE,
+                post.getId(),
+                message
+        );
     }
 }
