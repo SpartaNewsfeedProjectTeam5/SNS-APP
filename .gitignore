@@ -38,3 +38,6 @@ out/
 .idea/
 /src/main/resources/application.properties
 /src/main/resources/application.yml
+
+### MacOS ###
+.DS_Store
