@@ -44,7 +44,7 @@ public class NotificationServiceImpl implements NotificationService{
     public List<NotificationResponse> findAllNotificationReceivedByEmail(String loginUserEmail) {
         User user = userDomainService.getUserByEmail(loginUserEmail);
 
-        List<Notification> notifications = notificationRepository.findByToUser(user);
+        List<Notification> notifications = notificationRepository.findByToUserOrderByCreatedAtDesc(user);
 
         return notifications.stream().map(NotificationResponse::create).collect(Collectors.toList());
     }
