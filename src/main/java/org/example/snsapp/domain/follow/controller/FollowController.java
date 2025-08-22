@@ -27,4 +27,14 @@ public class FollowController {
 
         return ResponseEntity.ok(followService.follow(email, dto));
     }
+
+    @DeleteMapping("/v1/follows/unfollow")
+    public ResponseEntity<FollowActionResponse> unfollow(
+            @SessionAttribute(name = Const.LOGIN_USER, required = false) String email,
+            @Valid @RequestBody FollowRequest dto
+    ) {
+        if (email == null) throw new CustomException(ErrorCode.NEED_AUTH);
+
+        return ResponseEntity.ok(followService.unfollow(email, dto));
+    }
 }

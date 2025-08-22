@@ -1,5 +1,6 @@
 package org.example.snsapp.domain.follow.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 import org.example.snsapp.domain.follow.entity.Follow;
@@ -10,6 +11,8 @@ import java.time.LocalDateTime;
 public class FollowActionResponse {
 
     private final String message;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private final LocalDateTime createdAt;
 
     @Builder
@@ -22,6 +25,12 @@ public class FollowActionResponse {
         return FollowActionResponse.builder()
                 .message(message)
                 .createdAt(createdAt)
+                .build();
+    }
+
+    public static FollowActionResponse ofUnfollow(String message) {
+        return FollowActionResponse.builder()
+                .message(message)
                 .build();
     }
 }
