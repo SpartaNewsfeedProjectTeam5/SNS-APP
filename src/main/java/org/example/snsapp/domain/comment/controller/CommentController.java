@@ -3,6 +3,7 @@ package org.example.snsapp.domain.comment.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 import org.example.snsapp.domain.comment.dto.CommentRequest;
 import org.example.snsapp.domain.comment.dto.CommentResponse;
 import org.example.snsapp.domain.comment.service.CommentService;
@@ -90,6 +91,7 @@ public class CommentController {
 
     @DeleteMapping("/v1/posts/{postId}/comments/{commentId}/likes")
     public ResponseEntity<CommentResponse> deleteCommentLike(
+
             @PathVariable Long postId,
             @PathVariable Long commentId,
             HttpServletRequest httpRequest) {

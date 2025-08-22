@@ -2,6 +2,7 @@ package org.example.snsapp.domain.comment.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+
 import org.example.snsapp.domain.comment.dto.CommentRequest;
 import org.example.snsapp.domain.comment.dto.CommentResponse;
 import org.example.snsapp.domain.comment.entity.Comment;
@@ -43,7 +44,7 @@ public class CommentService {
     @Transactional
     public CommentResponse createComment(Long postId, String userEmail, CommentRequest request) {
         User user = findUserByEmail(userEmail);
-        Post post = postRepository.findPostByIdOrThrow(postId);
+        Post post = findPostById(postId);
 
         Comment comment = Comment.createComment(user, post, request.getContent());
         Comment savedComment = commentRepository.save(comment);
@@ -57,7 +58,7 @@ public class CommentService {
      * 게시글의 댓글 목록 조회 (페이징, 정렬)
      */
     public List<CommentResponse> getComments(Long postId, int page, int size, String sort, Sort.Direction direction) {
-        postRepository.findPostByIdOrThrow(postId); // 게시글 존재 여부 확인
+        findPostById(postId); // 게시글 존재 여부 확인
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sort));
         Page<Comment> commentPage = commentRepository.findByCommentIdWithUser(postId, pageable);
@@ -84,7 +85,7 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long postId, Long commentId, String userEmail) {
         Comment comment = validateCommentAccess(postId, commentId, userEmail);
-        Post post = postRepository.findPostByIdOrThrow(postId);
+        Post post = findPostById(postId);
         post.decreaseCommentCount();
 
         commentRepository.delete(comment);
@@ -149,7 +150,7 @@ public class CommentService {
      * 댓글 좋아요 기본 검증 (게시글, 댓글 존재 여부)
      */
     private void validateCommentLikeBase(Long postId, Long commentId) {
-        postRepository.findPostByIdOrThrow(postId);
+        findPostById(postId);
         findCommentById(commentId);
     }
 
@@ -157,7 +158,7 @@ public class CommentService {
      * 댓글 접근 권한 검증 (작성자 확인 포함)
      */
     private Comment validateCommentAccess(Long postId, Long commentId, String userEmail) {
-        postRepository.findPostByIdOrThrow(postId);
+        findPostById(postId);
         Comment comment = findCommentById(commentId);
         validateCommentAuthor(comment, userEmail);
         return comment;
@@ -182,18 +183,19 @@ public class CommentService {
     }
 
     /**
+     * 게시글 ID로 게시글 조회
+     */
+    private Post findPostById(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+    }
+
+    /**
      * 댓글 작성자 권한 확인
      */
     private void validateCommentAuthor(Comment comment, String userEmail) {
         if (!comment.getUser().getEmail().equals(userEmail)) {
             throw new CustomException(ErrorCode.COMMENT_FORBIDDEN);
         }
-    }
-
-    /**
-     * 댓글 작성자 권한 확인
-     */
-    private boolean MatchAuthorEmail(Comment comment, String userEmail) {
-        return Objects.equals(comment.getUser().getEmail(),userEmail);
     }
 }

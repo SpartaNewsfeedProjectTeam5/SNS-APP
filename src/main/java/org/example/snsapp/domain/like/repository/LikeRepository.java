@@ -17,4 +17,5 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     boolean existsByUserAndTypeAndTypeId(User user, LikeContentType type, Long typeId);
 
     List<Like> findLikesByUser(User user);
+
 }

@@ -22,6 +22,7 @@ public enum ErrorCode {
     COMMENT_FORBIDDEN(HttpStatus.FORBIDDEN, "CMT-002", "댓글에 대한 권한이 없습니다."),
     COMMENT_LIKE_PERMISSION_ERROR(HttpStatus.FORBIDDEN, "CMT-003", "자신의 댓글에는 좋아요를 누를 수 없습니다.."),
 
+
     // 유저 관련
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "USR-001", "이미 가입된 이메일입니다."),
     AUTH_ERROR(HttpStatus.UNAUTHORIZED, "USR-002", "아이디 또는 비밀번호가 잘못되었습니다."),

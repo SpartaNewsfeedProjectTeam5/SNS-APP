@@ -53,6 +53,7 @@ public class Comment extends AuditableEntity {
 
     public void decreaseLikeCount() {
         this.likeCount=this.likeCount-1;
+
     }
 }
 
