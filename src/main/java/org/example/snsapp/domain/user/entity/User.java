@@ -10,7 +10,7 @@ import org.example.snsapp.global.entity.AuditableEntity;
 
 @Getter
 @Entity
-
+@Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends AuditableEntity {
 

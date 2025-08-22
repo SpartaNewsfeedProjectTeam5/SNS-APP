@@ -1,15 +1,15 @@
 package org.example.snsapp.domain.comment.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.snsapp.domain.comment.dto.CommentLikeResponse;
 import org.example.snsapp.domain.comment.dto.CommentRequest;
 import org.example.snsapp.domain.comment.dto.CommentResponse;
 import org.example.snsapp.domain.comment.service.CommentService;
-import org.example.snsapp.domain.user.entity.User;
-import org.example.snsapp.global.constant.Const;
+import org.example.snsapp.global.enums.ErrorCode;
+import org.example.snsapp.global.exception.CustomException;
+import org.example.snsapp.global.util.SessionUtils; // SessionUtils import
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +29,9 @@ public class CommentController {
             @Valid @RequestBody CommentRequest request,
             HttpServletRequest httpRequest) {
 
-        String userEmail = getCurrentUserEmail(httpRequest);
+        String userEmail = SessionUtils.getLoginUserEmailByServlet(httpRequest)
+                .orElseThrow(() -> new CustomException(ErrorCode.NEED_AUTH));
+
         CommentResponse response = commentService.createComment(postId, userEmail, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -46,26 +48,29 @@ public class CommentController {
         return ResponseEntity.ok(comments);
     }
 
-    @PutMapping("/v2/posts/{postId}/comments/{commentId}")
+    @PutMapping("/v1/posts/{postId}/comments/{commentId}")
     public ResponseEntity<CommentResponse> updateComment(
             @PathVariable Long postId,
             @PathVariable Long commentId,
             @Valid @RequestBody CommentRequest request,
             HttpServletRequest httpRequest) {
 
-        String userEmail = getCurrentUserEmail(httpRequest);
+        String userEmail = SessionUtils.getLoginUserEmailByServlet(httpRequest)
+                .orElseThrow(() -> new CustomException(ErrorCode.NEED_AUTH));
+
         CommentResponse response = commentService.updateComment(postId, commentId, userEmail, request);
         return ResponseEntity.ok(response);
     }
 
-
-    @DeleteMapping("/v2/posts/{postId}/comments/{commentId}")
+    @DeleteMapping("/v1/posts/{postId}/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long postId,
             @PathVariable Long commentId,
             HttpServletRequest httpRequest) {
 
-        String userEmail = getCurrentUserEmail(httpRequest);
+        String userEmail = SessionUtils.getLoginUserEmailByServlet(httpRequest)
+                .orElseThrow(() -> new CustomException(ErrorCode.NEED_AUTH));
+
         commentService.deleteComment(postId, commentId, userEmail);
         return ResponseEntity.noContent().build();
     }
@@ -76,7 +81,9 @@ public class CommentController {
             @PathVariable Long commentId,
             HttpServletRequest httpRequest) {
 
-        String userEmail = getCurrentUserEmail(httpRequest);
+        String userEmail = SessionUtils.getLoginUserEmailByServlet(httpRequest)
+                .orElseThrow(() -> new CustomException(ErrorCode.NEED_AUTH));
+
         CommentLikeResponse response = commentService.createCommentLike(postId, commentId, userEmail);
         return ResponseEntity.ok(response);
     }
@@ -87,23 +94,10 @@ public class CommentController {
             @PathVariable Long commentId,
             HttpServletRequest httpRequest) {
 
-        String userEmail = getCurrentUserEmail(httpRequest);
+        String userEmail = SessionUtils.getLoginUserEmailByServlet(httpRequest)
+                .orElseThrow(() -> new CustomException(ErrorCode.NEED_AUTH));
+
         CommentLikeResponse response = commentService.deleteCommentLike(postId, commentId, userEmail);
         return ResponseEntity.ok(response);
-    }
-
-
-    private String getCurrentUserEmail(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null) {
-            throw new IllegalStateException("로그인이 필요합니다.");
-        }
-
-        Object userObj = session.getAttribute(Const.LOGIN_USER);
-        if (userObj == null) {
-            throw new IllegalStateException("로그인 정보가 없습니다.");
-        }
-
-        return userObj instanceof User ? ((User) userObj).getEmail() : userObj.toString();
     }
 }
