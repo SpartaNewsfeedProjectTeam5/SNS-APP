@@ -33,7 +33,7 @@ public class FollowService {
         Follow follow = Follow.create(followerUser, followingUser);
         followRepository.save(follow);
 
-        return FollowActionResponse.create("팔로우가 완료 되었습니다.", follow.getCreatedAt());
+        return FollowActionResponse.ofFollow("팔로우가 완료 되었습니다.", follow.getCreatedAt());
     }
 
     @Transactional

@@ -21,7 +21,7 @@ public class FollowActionResponse {
         this.createdAt = createdAt;
     }
 
-    public static FollowActionResponse create(String message, LocalDateTime createdAt) {
+    public static FollowActionResponse ofFollow(String message, LocalDateTime createdAt) {
         return FollowActionResponse.builder()
                 .message(message)
                 .createdAt(createdAt)
