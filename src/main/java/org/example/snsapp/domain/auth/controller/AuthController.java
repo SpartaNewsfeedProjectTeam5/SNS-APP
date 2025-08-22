@@ -25,7 +25,7 @@ public class AuthController {
         return ResponseEntity.ok(auth);
     }
 
-    @PostMapping("/v1/auth/signUp")
+    @PostMapping("/v1/auth/signup")
     public ResponseEntity<AuthSignUpResponse> signUp (@Valid @RequestBody AuthSignUpRequest authRequest) {
         return ResponseEntity.ok(signUpService.signUp(authRequest));
     }
