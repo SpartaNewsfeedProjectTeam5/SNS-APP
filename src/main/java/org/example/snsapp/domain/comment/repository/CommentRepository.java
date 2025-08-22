@@ -12,9 +12,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     // 페이징 처리된 댓글 조회 (User 정보 포함)
     @Query("SELECT c FROM Comment c " +
             "JOIN FETCH c.user " +
-            "WHERE c.post.id = :postId " +
-            "ORDER BY c.createdAt ASC")
-    Page<Comment> findByPostIdWithUser(@Param("postId") Long postId, Pageable pageable);
+            "WHERE c.post.id = :postId")
+    Page<Comment> findByCommentIdWithUser(@Param("postId") Long postId, Pageable pageable);
 
 }
 
