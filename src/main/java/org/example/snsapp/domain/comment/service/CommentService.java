@@ -54,14 +54,11 @@ public class CommentService {
     /**
      * 게시글의 댓글 목록 조회 (페이징, 정렬)
      */
-    public List<CommentResponse> getComments(Long postId, int page, int size, String sort, String direction) {
+    public List<CommentResponse> getComments(Long postId, int page, int size, String sort, Sort.Direction direction) {
         findPostById(postId); // 게시글 존재 여부 확인
 
-        Sort.Direction sortDirection = direction.equalsIgnoreCase("asc") ?
-                Sort.Direction.ASC : Sort.Direction.DESC;
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
-        Page<Comment> commentPage = commentRepository.findByPostIdWithUser(postId, pageable);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sort));
+        Page<Comment> commentPage = commentRepository.findByCommentIdWithUser(postId, pageable);
 
         return commentPage.getContent()
                 .stream()

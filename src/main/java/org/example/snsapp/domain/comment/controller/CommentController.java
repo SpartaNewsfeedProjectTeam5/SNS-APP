@@ -10,6 +10,7 @@ import org.example.snsapp.domain.comment.service.CommentService;
 import org.example.snsapp.global.enums.ErrorCode;
 import org.example.snsapp.global.exception.CustomException;
 import org.example.snsapp.global.util.SessionUtils; // SessionUtils import
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +43,7 @@ public class CommentController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sort,
-            @RequestParam(defaultValue = "desc") String direction) {
+            @RequestParam(defaultValue = "DESC") Sort.Direction direction) {
 
         List<CommentResponse> comments = commentService.getComments(postId, page, size, sort, direction);
         return ResponseEntity.ok(comments);
