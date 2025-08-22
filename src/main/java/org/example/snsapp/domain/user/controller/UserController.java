@@ -2,7 +2,6 @@ package org.example.snsapp.domain.user.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.example.snsapp.domain.user.dto.*;
@@ -21,7 +20,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/v1/users/profile")
-    public ResponseEntity<UserBaseResponse> getUserProfile(
+    public ResponseEntity<UserProfileResponse> getUserProfile(
             @RequestParam
             @Email(message = "올바른 이메일 형식이 아닙니다.")
             @Size(max = 40, message = "40자 이내로 입력해주세요.") String email
@@ -30,7 +29,7 @@ public class UserController {
     }
 
     @PutMapping("/v1/users/me/profile")
-    public ResponseEntity<UserUpdateResponse> updateUserProfile(
+    public ResponseEntity<UserProfileResponse> updateUserProfile(
             @SessionAttribute(name = Const.LOGIN_USER, required = false) String email,
             @Valid @RequestBody UserUpdateRequest dto
     ) {
