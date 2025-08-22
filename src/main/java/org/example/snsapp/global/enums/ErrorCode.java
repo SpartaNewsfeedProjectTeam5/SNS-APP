@@ -35,7 +35,11 @@ public enum ErrorCode {
 
     // 좋아요 관련
     ALREADY_LIKED(HttpStatus.CONFLICT, "LIKE-001", "이미 좋아요를 눌렀습니다."),
-    LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "LIKE-002", "좋아요를 누르지 않았습니다.");
+    LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "LIKE-002", "좋아요를 누르지 않았습니다."),
+
+    // 팔로우
+    CANNOT_FOLLOW_SELF(HttpStatus.BAD_REQUEST, "FOW-001", "자기 자신을 팔로우 할 수 없습니다."),
+    ALREADY_FOLLOWING(HttpStatus.BAD_REQUEST, "FOW-002", "이미 팔로우 중인 사용자 입니다.");
 
     private final HttpStatus status;
     private final String code;
