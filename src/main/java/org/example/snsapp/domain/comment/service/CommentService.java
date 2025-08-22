@@ -7,14 +7,15 @@ import org.example.snsapp.domain.comment.dto.CommentRequest;
 import org.example.snsapp.domain.comment.dto.CommentResponse;
 import org.example.snsapp.domain.comment.entity.Comment;
 import org.example.snsapp.domain.comment.repository.CommentRepository;
-import org.example.snsapp.domain.like.entity.Like;
-import org.example.snsapp.domain.like.repository.LikeRepository;
+import org.example.snsapp.domain.like.service.LikeService;
+import org.example.snsapp.domain.notification.service.NotificationService;
 import org.example.snsapp.domain.post.entity.Post;
 import org.example.snsapp.domain.post.repository.PostRepository;
 import org.example.snsapp.domain.user.entity.User;
 import org.example.snsapp.domain.user.repository.UserRepository;
 import org.example.snsapp.global.enums.ErrorCode;
 import org.example.snsapp.global.enums.LikeContentType;
+import org.example.snsapp.global.enums.NotificationContentType;
 import org.example.snsapp.global.exception.CustomException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,7 +37,8 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final LikeRepository likeRepository;
+    private final LikeService likeService;
+    private final NotificationService notificationService;
 
     /**
      * 댓글 작성
@@ -50,6 +52,9 @@ public class CommentService {
         Comment savedComment = commentRepository.save(comment);
 
         post.increaseCommentCount();
+
+        // 알람 기능
+        createCommentNotification(user, post);
 
         return CommentResponse.create(savedComment);
     }
@@ -106,15 +111,17 @@ public class CommentService {
 
 
         // 중복 좋아요 체크
-        if (likeRepository.findByUserAndTypeAndTypeId(user, LikeContentType.COMMENT, commentId).isPresent()) {
+        if (likeService.existsByUserAndTypeAndTypeId(user, LikeContentType.COMMENT, commentId)) {
             throw new CustomException(ErrorCode.ALREADY_LIKED);
         }
+
+        likeService.addLike(user, LikeContentType.COMMENT, commentId);
 
         // 좋아요 수 카운트
         comment.increaseLikeCount();
 
-        Like commentLike = Like.createCommentLike(user, commentId);
-        likeRepository.save(commentLike);
+        // 알람 생성
+        createCommentLikeNotification(user, comment);
 
         return CommentResponse.create(comment);
     }
@@ -128,16 +135,56 @@ public class CommentService {
         User user = findUserByEmail(userEmail);
         Comment comment = findCommentById(commentId);
 
+        // 자기 댓글에 좋아요 금지
+        if(MatchAuthorEmail(comment,userEmail))
+            throw new CustomException(ErrorCode.COMMENT_LIKE_PERMISSION_ERROR);
+
         // 좋아요 존재 여부 체크
-        if (likeRepository.findByUserAndTypeAndTypeId(user, LikeContentType.COMMENT, commentId).isEmpty()) {
+        if (!likeService.existsByUserAndTypeAndTypeId(user, LikeContentType.COMMENT, commentId)) {
             throw new CustomException(ErrorCode.LIKE_NOT_FOUND);
         }
 
         // 좋아요 수 카운트
         comment.decreaseLikeCount();
 
-        likeRepository.deleteByUserAndTypeAndTypeId(user, LikeContentType.COMMENT, commentId);
+        likeService.removeLike(user, LikeContentType.COMMENT, commentId);
         return CommentResponse.create(comment);
+    }
+
+    /**
+     * 댓글 좋아요 알람 생성
+     *
+     * @param from    보내는 유저
+     * @param comment 댓글 엔티티
+     */
+    private void createCommentLikeNotification(User from, Comment comment) {
+        String message = from.getUsername() + "님이 댓글에 좋아요를 남기셨습니다.";
+
+        notificationService.create(
+                from,
+                comment.getUser(),
+                NotificationContentType.LIKE,
+                comment.getId(),
+                message
+        );
+    }
+
+    /**
+     * 댓글 알람 생성
+     *
+     * @param from 보내는 유저
+     * @param post 게시물 엔티티
+     */
+    private void createCommentNotification(User from, Post post) {
+        String message = from.getUsername() + "님이 " + post.getTitle() + " 게시글에 댓글을 남기셨습니다.";
+
+        notificationService.create(
+                from,
+                post.getUser(),
+                NotificationContentType.COMMENT,
+                post.getId(),
+                message
+        );
     }
 
     // === 검증 메서드들 ===
@@ -195,6 +242,9 @@ public class CommentService {
         }
     }
 
+    /**
+     * 댓글 작성자 권한 확인
+     */
     private boolean MatchAuthorEmail(Comment comment, String userEmail) {
         return Objects.equals(comment.getUser().getEmail(), userEmail);
     }

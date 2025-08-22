@@ -26,4 +26,15 @@ public class UserDomainService {
     public User getUserById(Long id) {
         return userRepository.getReferenceById(id);
     }
+
+    /**
+     * 이메일로 유저 엔티티 조회
+     *
+     * @param email 이메일
+     * @return 유저 엔티티
+     */
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmailOrElseThrow(email);
+    }
+
 }

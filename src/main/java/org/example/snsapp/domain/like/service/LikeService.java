@@ -27,4 +27,14 @@ public interface LikeService {
      * @param typeId 타입 아이디
      */
     void removeLike(User user, LikeContentType type, Long typeId);
+
+    /**
+     * 해당 조건에 맞는 테이블이 존재하는지 비교값 반환
+     *
+     * @param user   유저 엔티티
+     * @param type   타입
+     * @param typeId 타입아이디
+     * @return 존재한다면 true, 존재하지 않는다면 false
+     */
+    boolean existsByUserAndTypeAndTypeId(User user, LikeContentType type, Long typeId);
 }
