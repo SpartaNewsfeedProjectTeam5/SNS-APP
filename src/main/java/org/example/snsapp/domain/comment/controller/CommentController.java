@@ -3,7 +3,6 @@ package org.example.snsapp.domain.comment.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.snsapp.domain.comment.dto.CommentLikeResponse;
 import org.example.snsapp.domain.comment.dto.CommentRequest;
 import org.example.snsapp.domain.comment.dto.CommentResponse;
 import org.example.snsapp.domain.comment.service.CommentService;
@@ -77,7 +76,7 @@ public class CommentController {
     }
 
     @PostMapping("/v1/posts/{postId}/comments/{commentId}/likes")
-    public ResponseEntity<CommentLikeResponse> createCommentLike(
+    public ResponseEntity<CommentResponse> createCommentLike(
             @PathVariable Long postId,
             @PathVariable Long commentId,
             HttpServletRequest httpRequest) {
@@ -85,12 +84,12 @@ public class CommentController {
         String userEmail = SessionUtils.getLoginUserEmailByServlet(httpRequest)
                 .orElseThrow(() -> new CustomException(ErrorCode.NEED_AUTH));
 
-        CommentLikeResponse response = commentService.createCommentLike(postId, commentId, userEmail);
+        CommentResponse response = commentService.createCommentLike(postId, commentId, userEmail);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/v1/posts/{postId}/comments/{commentId}/likes")
-    public ResponseEntity<CommentLikeResponse> deleteCommentLike(
+    public ResponseEntity<CommentResponse> deleteCommentLike(
             @PathVariable Long postId,
             @PathVariable Long commentId,
             HttpServletRequest httpRequest) {
@@ -98,7 +97,7 @@ public class CommentController {
         String userEmail = SessionUtils.getLoginUserEmailByServlet(httpRequest)
                 .orElseThrow(() -> new CustomException(ErrorCode.NEED_AUTH));
 
-        CommentLikeResponse response = commentService.deleteCommentLike(postId, commentId, userEmail);
+        CommentResponse response = commentService.deleteCommentLike(postId, commentId, userEmail);
         return ResponseEntity.ok(response);
     }
 }

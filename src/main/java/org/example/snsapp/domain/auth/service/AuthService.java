@@ -36,7 +36,7 @@ public class AuthService {
     public AuthSignUpResponse signUp(AuthSignUpRequest signUpRequest) {
         Optional<User> optionalUser = authRepository.findByEmail(signUpRequest.getEmail());
         if (optionalUser.isPresent()) throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
-        User user = userRepository.save(new User(signUpRequest.getEmail(), passwordEncoder.encode(signUpRequest.getPassword()), signUpRequest.getUsername(), signUpRequest.getAge(), false, signUpRequest.getProfileImage()));
+        User user = userRepository.save(User.create(signUpRequest.getEmail(), passwordEncoder.encode(signUpRequest.getPassword()), signUpRequest.getUsername(), signUpRequest.getAge(), false, signUpRequest.getProfileImage()));
         return AuthSignUpResponse.create(user);
     }
 

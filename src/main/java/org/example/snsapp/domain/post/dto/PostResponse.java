@@ -13,10 +13,10 @@ public class PostResponse {
     private final String email;
     private final String title;
     private final String content;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime modifiedAt;
     private final int commentCount;
     private final int likeCount;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime modifiedAt;
 
     @Builder
     private PostResponse(

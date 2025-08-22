@@ -5,14 +5,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.snsapp.domain.post.dto.PostRequest;
 import org.example.snsapp.domain.post.dto.PostResponse;
-import org.example.snsapp.domain.post.entity.Post;
 import org.example.snsapp.domain.post.service.PostService;
 import org.example.snsapp.global.enums.ErrorCode;
 import org.example.snsapp.global.enums.SearchType;
 import org.example.snsapp.global.exception.CustomException;
 import org.example.snsapp.global.util.SessionUtils;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -28,6 +26,7 @@ import java.util.List;
  * <p>요청을 받아 게시물 생성, 조회, 검색, 수정, 삭제 기능 제공</p>
  */
 @RestController
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
@@ -39,7 +38,7 @@ public class PostController {
      * @param request     HTTP 요청 정보
      * @return HTTP 상태 코드와 게시물 기본 응답 DTO
      */
-    @PostMapping("/api/v1/posts")
+    @PostMapping("/v1/posts")
     public ResponseEntity<PostResponse> create(
             @Valid @RequestBody PostRequest postRequest,
             HttpServletRequest request) {
@@ -59,7 +58,7 @@ public class PostController {
      * @param pageable   페이지, 사이즈, 정렬, 정렬방향을 받는 {@link Pageable} 객체.
      * @return HTTP 상태 코드와 게시물 페이지 응답 DTO의 List
      */
-    @GetMapping("/api/v1/posts/search")
+    @GetMapping("/v1/posts/search")
     public ResponseEntity<List<PostResponse>> search(
             @RequestParam String keyword,
             @RequestParam SearchType searchType,
@@ -80,7 +79,7 @@ public class PostController {
      * @param request  HTTP 요청 정보
      * @return HTTP 상태 코드와 게시물 페이지 응답 DTO의 List
      */
-    @GetMapping("/api/v1/posts/myposts")
+    @GetMapping("/v1/posts/myposts")
     public ResponseEntity<List<PostResponse>> findAllBySessionEmail(
             @PageableDefault(
                     page = 0,
@@ -103,7 +102,7 @@ public class PostController {
      * @param request     HTTP 요청 정보
      * @return HTTP 상태 코드와 게시물 기본 응답 DTO
      */
-    @PutMapping("/api/v1/posts/{postId}")
+    @PutMapping("/v1/posts/{postId}")
     public ResponseEntity<PostResponse> update(
             @PathVariable Long postId,
             @Valid @RequestBody PostRequest postRequest,
@@ -122,7 +121,7 @@ public class PostController {
      * @param request HTTP 요청 정보
      * @return HTTP 상태 코드
      */
-    @DeleteMapping("/api/v1/posts/{postId}")
+    @DeleteMapping("/v1/posts/{postId}")
     public ResponseEntity<Void> delete(@PathVariable Long postId,
                                        HttpServletRequest request) {
         String loginUserEmail = getSessionEmail(request);
@@ -139,7 +138,7 @@ public class PostController {
      * @param request HTTP 요청 정보
      * @return HTTP 상태 코드와 게시물 기본 응답 DTO
      */
-    @PostMapping("/api/v1/posts/{postId}/likes")
+    @PostMapping("/v1/posts/{postId}/likes")
     public ResponseEntity<PostResponse> addLike(
             @PathVariable Long postId,
             HttpServletRequest request) {
@@ -151,11 +150,11 @@ public class PostController {
     /**
      * 게시물 좋아요 삭제
      *
-     * @param postId
-     * @param request
-     * @return
+     * @param postId  게시물 아이디
+     * @param request HTTP 요청 정보
+     * @return HTTP 상태 코드와 게시물 기본 응답 DTO
      */
-    @DeleteMapping("/api/v1/posts/{postId}/likes")
+    @DeleteMapping("/v1/posts/{postId}/likes")
     public ResponseEntity<Void> removeLike(
             @PathVariable Long postId,
             HttpServletRequest request) {

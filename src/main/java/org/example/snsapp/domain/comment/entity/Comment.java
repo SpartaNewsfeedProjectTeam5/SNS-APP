@@ -25,6 +25,9 @@ public class Comment extends AuditableEntity {
     @Column(name = "content", nullable = false, length = 100)
     private String content;
 
+    @Column(name ="like_count",nullable = false)
+    private int likeCount;
+
     @Builder
     public Comment(User user, Post post, String content) {
         this.user = user;
@@ -42,6 +45,14 @@ public class Comment extends AuditableEntity {
 
     public void updateContent(String content) {
         this.content = content;
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount=this.likeCount+1;
+    }
+
+    public void decreaseLikeCount() {
+        this.likeCount=this.likeCount-1;
     }
 }
 

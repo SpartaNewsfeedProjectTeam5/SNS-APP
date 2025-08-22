@@ -1,9 +1,6 @@
 package org.example.snsapp.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.snsapp.domain.like.dto.LikeResponse;
-import org.example.snsapp.domain.like.entity.Like;
-import org.example.snsapp.domain.like.repository.LikeRepository;
 import org.example.snsapp.domain.like.service.LikeService;
 import org.example.snsapp.domain.post.dto.PostRequest;
 import org.example.snsapp.domain.post.dto.PostResponse;
@@ -39,7 +36,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     @Override
     public PostResponse create(String loginUserEmail, PostRequest postRequest) {
-        User user = userRepository.findUserByEmailOrElseThrow(loginUserEmail);
+        User user = userRepository.findByEmailOrElseThrow(loginUserEmail);
 
         Post post = Post.builder()
                 .user(user)
@@ -57,10 +54,7 @@ public class PostServiceImpl implements PostService {
     public Page<PostResponse> search(String keyword, SearchType searchType, Pageable pageable) {
         Page<Post> postPage = postRepository.search(keyword, searchType.toString(), pageable);
 
-        return postPage.map(post -> {
-            int commentCount = 1;
-            return PostResponse.create(post);
-        });
+        return postPage.map(PostResponse::create);
     }
 
 
@@ -105,14 +99,15 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostResponse addLike(Long postId, String loginUserEmail) {
         Post post = postRepository.findPostByIdOrThrow(postId);
-        User user = userRepository.findUserByEmailOrElseThrow(loginUserEmail);
 
         // 작성자와 로그인 유저가 같다면 좋아요 금지
         if (MatchAuthorEmail(post, loginUserEmail))
             throw new CustomException(ErrorCode.POST_LIKE_PERMISSION_ERROR);
 
+        User user = userRepository.findByEmailOrElseThrow(loginUserEmail);
+
         likeService.addLike(user, LikeContentType.POST, postId);
-        post.addLike();
+        post.increaseLikeCount();
 
         return PostResponse.create(post);
     }
@@ -121,14 +116,15 @@ public class PostServiceImpl implements PostService {
     @Override
     public void removeLike(Long postId, String loginUserEmail) {
         Post post = postRepository.findPostByIdOrThrow(postId);
-        User user = userRepository.findUserByEmailOrElseThrow(loginUserEmail);
 
         // 작성자와 로그인 유저가 같다면 좋아요 금지
         if (MatchAuthorEmail(post, loginUserEmail))
             throw new CustomException(ErrorCode.POST_LIKE_PERMISSION_ERROR);
 
+        User user = userRepository.findByEmailOrElseThrow(loginUserEmail);
+
         likeService.removeLike(user, LikeContentType.POST, postId);
-        post.removeLike();
+        post.decreaseLikeCount();
     }
 
     /**
@@ -140,5 +136,15 @@ public class PostServiceImpl implements PostService {
      */
     private boolean MatchAuthorEmail(Post post, String email) {
         return Objects.equals(post.getUser().getEmail(), email);
+    }
+
+    /**
+     * 게시글 ID로 게시글 조회
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public Post findPostById(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
     }
 }
