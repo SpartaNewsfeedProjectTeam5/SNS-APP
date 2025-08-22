@@ -39,7 +39,9 @@ public enum ErrorCode {
 
     // 팔로우
     CANNOT_FOLLOW_SELF(HttpStatus.BAD_REQUEST, "FOW-001", "자기 자신을 팔로우 할 수 없습니다."),
-    ALREADY_FOLLOWING(HttpStatus.BAD_REQUEST, "FOW-002", "이미 팔로우 중인 사용자 입니다.");
+    CANNOT_UNFOLLOW_SELF(HttpStatus.BAD_REQUEST, "FOW-002", "자기 자신을 언팔로우 할 수 없습니다."),
+    ALREADY_FOLLOWING(HttpStatus.BAD_REQUEST, "FOW-003", "이미 팔로우 중인 사용자 입니다."),
+    NOT_FOLLOWING(HttpStatus.BAD_REQUEST, "FOW-004", "팔로우하지 않는 사용자 입니다.");
 
     private final HttpStatus status;
     private final String code;
