@@ -25,7 +25,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+/**
+ * 댓글 관련 비즈니스 로직을 처리하는 서비스
+ */
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -35,8 +37,9 @@ public class CommentService {
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
 
-
-    // 댓글 작성
+    /**
+     * 댓글 작성
+     */
     @Transactional
     public CommentResponse createComment(Long postId, String userEmail, CommentRequest request) {
         User user = findUserByEmail(userEmail);
@@ -48,15 +51,17 @@ public class CommentService {
         return CommentResponse.from(savedComment);
     }
 
+    /**
+     * 게시글의 댓글 목록 조회 (페이징, 정렬)
+     */
     public List<CommentResponse> getComments(Long postId, int page, int size, String sort, String direction) {
-        findPostById(postId);
+        findPostById(postId); // 게시글 존재 여부 확인
 
         Sort.Direction sortDirection = direction.equalsIgnoreCase("asc") ?
                 Sort.Direction.ASC : Sort.Direction.DESC;
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
-
-        Page<Comment> commentPage = commentRepository.findByPostId(postId, pageable);
+        Page<Comment> commentPage = commentRepository.findByPostIdWithUser(postId, pageable);
 
         return commentPage.getContent()
                 .stream()
@@ -64,59 +69,74 @@ public class CommentService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 댓글 수정 (작성자만 가능)
+     */
     @Transactional
     public CommentResponse updateComment(Long postId, Long commentId, String userEmail, CommentRequest request) {
         Comment comment = validateCommentAccess(postId, commentId, userEmail);
-
         comment.updateContent(request.getContent());
         return CommentResponse.from(comment);
     }
 
+    /**
+     * 댓글 삭제 (작성자만 가능)
+     */
     @Transactional
     public void deleteComment(Long postId, Long commentId, String userEmail) {
         Comment comment = validateCommentAccess(postId, commentId, userEmail);
-
-
         commentRepository.delete(comment);
     }
 
+    /**
+     * 댓글 좋아요 추가
+     */
     @Transactional
     public CommentLikeResponse createCommentLike(Long postId, Long commentId, String userEmail) {
-        CommentLikeValidation validation = validateCommentLikeAccess(postId, commentId, userEmail);
+        validateCommentLikeBase(postId, commentId);
+        User user = findUserByEmail(userEmail);
 
-        if (!likeRepository.findByUserAndTypeAndTypeId(validation.user(), LikeContentType.COMMENT, commentId).isEmpty()) {
+        // 중복 좋아요 체크
+        if (!likeRepository.findByUserAndTypeAndTypeId(user, LikeContentType.COMMENT, commentId).isEmpty()) {
             throw new CustomException(ErrorCode.ALREADY_LIKED);
         }
 
-        Like commentLike = Like.createCommentLike(validation.user(), commentId);
+        Like commentLike = Like.createCommentLike(user, commentId);
         likeRepository.save(commentLike);
 
         return CommentLikeResponse.likeCreated();
     }
 
+    /**
+     * 댓글 좋아요 삭제
+     */
     @Transactional
     public CommentLikeResponse deleteCommentLike(Long postId, Long commentId, String userEmail) {
-        CommentLikeValidation validation = validateCommentLikeAccess(postId, commentId, userEmail);
+        validateCommentLikeBase(postId, commentId);
+        User user = findUserByEmail(userEmail);
 
-        if (likeRepository.findByUserAndTypeAndTypeId(validation.user(), LikeContentType.COMMENT, commentId).isEmpty()) {
+        // 좋아요 존재 여부 체크
+        if (likeRepository.findByUserAndTypeAndTypeId(user, LikeContentType.COMMENT, commentId).isEmpty()) {
             throw new CustomException(ErrorCode.LIKE_NOT_FOUND);
         }
 
-        likeRepository.deleteByUserAndTypeAndTypeId(validation.user(), LikeContentType.COMMENT, commentId);
+        likeRepository.deleteByUserAndTypeAndTypeId(user, LikeContentType.COMMENT, commentId);
         return CommentLikeResponse.likeRemoved();
     }
 
-    private record CommentLikeValidation(User user) {
-    }
+    // === 검증 메서드들 ===
 
-
-    private CommentLikeValidation validateCommentLikeAccess(Long postId, Long commentId, String userEmail) {
+    /**
+     * 댓글 좋아요 기본 검증 (게시글, 댓글 존재 여부)
+     */
+    private void validateCommentLikeBase(Long postId, Long commentId) {
         findPostById(postId);
         findCommentById(commentId);
-        User user = findUserByEmail(userEmail);
-        return new CommentLikeValidation(user);
     }
 
+    /**
+     * 댓글 접근 권한 검증 (작성자 확인 포함)
+     */
     private Comment validateCommentAccess(Long postId, Long commentId, String userEmail) {
         findPostById(postId);
         Comment comment = findCommentById(commentId);
@@ -124,27 +144,38 @@ public class CommentService {
         return comment;
     }
 
+    // === 조회 메서드들 ===
+
+    /**
+     * 댓글 ID로 댓글 조회
+     */
     private Comment findCommentById(Long commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
     }
 
+    /**
+     * 이메일로 사용자 조회
+     */
     private User findUserByEmail(String email) {
         return userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
+    /**
+     * 게시글 ID로 게시글 조회
+     */
     private Post findPostById(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
-
     }
 
+    /**
+     * 댓글 작성자 권한 확인
+     */
     private void validateCommentAuthor(Comment comment, String userEmail) {
         if (!comment.getUser().getEmail().equals(userEmail)) {
             throw new CustomException(ErrorCode.COMMENT_FORBIDDEN);
         }
     }
 }
-
-
