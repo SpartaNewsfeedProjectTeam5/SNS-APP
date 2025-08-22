@@ -1,9 +1,6 @@
 package org.example.snsapp.domain.auth.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Length;
 
@@ -17,6 +14,8 @@ public class AuthSignUpRequest {
     @Email(message = "올바른 이메일 형식이 아닙니다.")
     @Length(min = 1, max = 40)
     private String email;
+    @NotNull(message = "이름, 나이, 아이디와 비밀번호는 필수 입력 항목입니다.")
+    @Min(value = 1, message = "나이는 1 이상이어야 합니다")
     private int age;
     @NotBlank(message = "이름, 나이, 아이디와 비밀번호는 필수 입력 항목입니다.")
     @Length(min = 1, max = 255)

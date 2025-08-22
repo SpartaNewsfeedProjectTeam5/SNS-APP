@@ -1,9 +1,9 @@
 package org.example.snsapp.domain.auth.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.snsapp.domain.auth.dto.*;
 import org.example.snsapp.domain.auth.repository.AuthRepository;
+import org.example.snsapp.domain.user.repository.UserRepository;
 import org.example.snsapp.global.enums.ErrorCode;
 import org.example.snsapp.global.exception.CustomException;
 import org.example.snsapp.global.util.PasswordEncoder;
@@ -23,37 +23,34 @@ public class AuthService {
     @Transactional(readOnly = true)
     public AuthLoginResponse login(AuthLoginRequest loginRequest) { //로그인
         User user = authRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        Boolean isResign = authRepository.userIsResignTrue(loginRequest.getEmail());
-        if (isResign) {
+        if (user.isResign()) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
         if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             return new AuthLoginResponse(user.getEmail());
         }
-        throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
     }
 
     @Transactional //회원가입
     public AuthSignUpResponse signUp(AuthSignUpRequest signUpRequest) {
         Optional<User> optionalUser = authRepository.findByEmail(signUpRequest.getEmail());
-        if (optionalUser.isPresent()) throw new EntityNotFoundException("이미 존재하는 사용자 아이디 입니다.");
+        if (optionalUser.isPresent()) throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
         User user = userRepository.save(new User(signUpRequest.getEmail(), passwordEncoder.encode(signUpRequest.getPassword()), signUpRequest.getUsername(), signUpRequest.getAge(), false, signUpRequest.getProfileImage()));
         return AuthSignUpResponse.create(user);
     }
 
     @Transactional //회원탈퇴
     public AuthDeleteResponse delete(AuthDeleteRequest deleteRequest) {
-        User user = authRepository.findByEmail(deleteRequest.getEmail()).orElseThrow(() -> new EntityNotFoundException("없는 회원입니다."));
+        User user = authRepository.findByEmail(deleteRequest.getEmail()).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        if (authRepository.userIsResignTrue(deleteRequest.getEmail())) {
-            throw new IllegalStateException("이미 탈퇴한 회원입니다.");
+        if (user.isResign()) {
+            throw new CustomException(ErrorCode.DELETED_USER);
         }
         if (passwordEncoder.matches(deleteRequest.getPassword(), user.getPassword())) {
             authRepository.setTrueUserIsResign(user.getId());
             return new AuthDeleteResponse();
         }
-        throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        throw new CustomException(ErrorCode.CURRENT_PASSWORD_NOT_MATCH);
     }
-
-    //에러 반환 enum 으로 처리
 }
