@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.example.snsapp.domain.follow.dto.*;
 import org.example.snsapp.domain.follow.entity.Follow;
 import org.example.snsapp.domain.follow.repository.FollowRepository;
+import org.example.snsapp.domain.notification.service.NotificationService;
 import org.example.snsapp.domain.user.entity.User;
 import org.example.snsapp.domain.user.service.UserDomainService;
 import org.example.snsapp.global.enums.ErrorCode;
+import org.example.snsapp.global.enums.NotificationContentType;
 import org.example.snsapp.global.exception.CustomException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,7 @@ public class FollowService {
 
     private final FollowRepository followRepository;
     private final UserDomainService userDomainService;
+    private final NotificationService notificationService;
 
     @Transactional
     public FollowActionResponse follow(String email, FollowRequest dto) {
@@ -32,6 +35,9 @@ public class FollowService {
         // 팔로우 생성 및 저장
         Follow follow = Follow.create(followerUser, followingUser);
         followRepository.save(follow);
+
+        // 알람 생성
+        createFollowNotification(follow);
 
         return FollowActionResponse.ofFollow("팔로우가 완료 되었습니다.", follow.getCreatedAt());
     }
@@ -72,5 +78,22 @@ public class FollowService {
 
 
         return FollowIds.create(followerId, followingId);
+    }
+
+    /**
+     * 팔로우 알람 생성
+     *
+     * @param follow 팔로우 엔티티
+     */
+    private void createFollowNotification(Follow follow) {
+        String message = follow.getFollower().getUsername() + "님이 팔로우 하셨습니다.";
+
+        notificationService.create(
+                follow.getFollower(),
+                follow.getFollowing(),
+                NotificationContentType.FOLLOW,
+                follow.getId(),
+                message
+        );
     }
 }
