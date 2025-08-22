@@ -29,7 +29,7 @@ public class AuthService {
         if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             return new AuthLoginResponse(user.getEmail());
         }
-        throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
+        throw new CustomException(ErrorCode.CURRENT_PASSWORD_NOT_MATCH);
     }
 
     @Transactional //회원가입
