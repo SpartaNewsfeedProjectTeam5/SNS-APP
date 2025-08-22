@@ -2,7 +2,7 @@ package org.example.snsapp.domain.comment.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.example.snsapp.domain.comment.dto.CommentLikeResponse;
+
 import org.example.snsapp.domain.comment.dto.CommentRequest;
 import org.example.snsapp.domain.comment.dto.CommentResponse;
 import org.example.snsapp.domain.comment.entity.Comment;
@@ -23,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -48,7 +49,9 @@ public class CommentService {
         Comment comment = Comment.createComment(user, post, request.getContent());
         Comment savedComment = commentRepository.save(comment);
 
-        return CommentResponse.from(savedComment);
+        post.increaseCommentCount();
+
+        return CommentResponse.create(savedComment);
     }
 
     /**
@@ -62,7 +65,7 @@ public class CommentService {
 
         return commentPage.getContent()
                 .stream()
-                .map(CommentResponse::from)
+                .map(CommentResponse::create)
                 .collect(Collectors.toList());
     }
 
@@ -73,7 +76,7 @@ public class CommentService {
     public CommentResponse updateComment(Long postId, Long commentId, String userEmail, CommentRequest request) {
         Comment comment = validateCommentAccess(postId, commentId, userEmail);
         comment.updateContent(request.getContent());
-        return CommentResponse.from(comment);
+        return CommentResponse.create(comment);
     }
 
     /**
@@ -82,6 +85,9 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long postId, Long commentId, String userEmail) {
         Comment comment = validateCommentAccess(postId, commentId, userEmail);
+        Post post = findPostById(postId);
+        post.decreaseCommentCount();
+
         commentRepository.delete(comment);
     }
 
@@ -89,36 +95,53 @@ public class CommentService {
      * 댓글 좋아요 추가
      */
     @Transactional
-    public CommentLikeResponse createCommentLike(Long postId, Long commentId, String userEmail) {
+    public CommentResponse createCommentLike(Long postId, Long commentId, String userEmail) {
         validateCommentLikeBase(postId, commentId);
         User user = findUserByEmail(userEmail);
+        Comment comment = findCommentById(commentId);
+
+        // 자기 댓글에 좋아요 금지
+        if(MatchAuthorEmail(comment,userEmail))
+            throw new CustomException(ErrorCode.COMMENT_LIKE_PERMISSION_ERROR);
+
 
         // 중복 좋아요 체크
-        if (!likeRepository.findByUserAndTypeAndTypeId(user, LikeContentType.COMMENT, commentId).isEmpty()) {
+        if (likeRepository.findByUserAndTypeAndTypeId(user, LikeContentType.COMMENT, commentId).isPresent()) {
             throw new CustomException(ErrorCode.ALREADY_LIKED);
         }
+
+        // 좋아요 수 카운트
+        comment.increaseLikeCount();
 
         Like commentLike = Like.createCommentLike(user, commentId);
         likeRepository.save(commentLike);
 
-        return CommentLikeResponse.likeCreated();
+        return CommentResponse.create(comment);
     }
 
     /**
      * 댓글 좋아요 삭제
      */
     @Transactional
-    public CommentLikeResponse deleteCommentLike(Long postId, Long commentId, String userEmail) {
+    public CommentResponse deleteCommentLike(Long postId, Long commentId, String userEmail) {
         validateCommentLikeBase(postId, commentId);
         User user = findUserByEmail(userEmail);
+        Comment comment = findCommentById(commentId);
+
+        // 자기 댓글에 좋아요 금지
+        if(MatchAuthorEmail(comment,userEmail))
+            throw new CustomException(ErrorCode.COMMENT_LIKE_PERMISSION_ERROR);
 
         // 좋아요 존재 여부 체크
         if (likeRepository.findByUserAndTypeAndTypeId(user, LikeContentType.COMMENT, commentId).isEmpty()) {
             throw new CustomException(ErrorCode.LIKE_NOT_FOUND);
         }
 
+        // 좋아요 수 카운트
+        comment.decreaseLikeCount();
+
         likeRepository.deleteByUserAndTypeAndTypeId(user, LikeContentType.COMMENT, commentId);
-        return CommentLikeResponse.likeRemoved();
+        return CommentResponse.create(comment);
     }
 
     // === 검증 메서드들 ===
