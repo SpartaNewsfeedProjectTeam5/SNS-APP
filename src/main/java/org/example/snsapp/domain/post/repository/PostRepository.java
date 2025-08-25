@@ -11,9 +11,24 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
+    @Query("""
+                SELECT p
+                FROM Post p
+                JOIN p.user u
+                WHERE
+                    (:type = 'date' AND p.createdAt >= :start_date AND p.createdAt <= :end_date)
+            """)
+    Page<Post> search(
+            @Param("start_date") LocalDateTime startDate,
+            @Param("end_date") LocalDateTime endDate,
+            @Param("type") String type,
+            Pageable pageable
+    );
+
     @Query("""
                 SELECT p
                 FROM Post p

@@ -1,6 +1,7 @@
 package org.example.snsapp.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.snsapp.domain.follow.service.FollowService;
 import org.example.snsapp.domain.like.service.LikeService;
 import org.example.snsapp.domain.notification.service.NotificationService;
@@ -21,6 +22,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,6 +35,7 @@ import java.util.Optional;
  *
  * <p>JPA를 사용하여 데이터를 데이터베이스에 저장, 조회, 수정, 삭제하는 기능 제공</p>
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
@@ -58,7 +64,20 @@ public class PostServiceImpl implements PostService {
     @Transactional(readOnly = true)
     @Override
     public Page<PostResponse> search(String keyword, SearchType searchType, Pageable pageable) {
-        Page<Post> postPage = postRepository.search(keyword, searchType.toString(), pageable);
+
+        Page<Post> postPage;
+        if (searchType == SearchType.DATE) {
+            String[] dates = keyword.split("~");
+            
+            LocalDateTime start = LocalDate.parse(dates[0], DateTimeFormatter.BASIC_ISO_DATE).atStartOfDay();
+            LocalDateTime end = LocalDate.parse(dates[1], DateTimeFormatter.BASIC_ISO_DATE).atTime(LocalTime.MAX);
+            postPage = postRepository.search(start, end, searchType.toString(), pageable);
+
+        } else
+            postPage = postRepository.search(keyword, searchType.toString(), pageable);
+
+
+
 
         return postPage.map(PostResponse::create);
     }
