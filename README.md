@@ -429,7 +429,7 @@ GET /api/v1/posts/search?keyword=20250825~20250825&searchType=date
 
 **Request Example**
 ```http
-DELETE /posts/1
+DELETE /api/v1/posts/1
 ```
 **Response (Success)**
 - 200 0K 
@@ -449,7 +449,7 @@ DELETE /posts/1
 
 **Request Example**
 ```http
-POST /posts/2/likes
+POST /api/v1/posts/2/likes
 ```
 **Response (Success)**
 ```json
@@ -481,7 +481,7 @@ POST /posts/2/likes
 
 **Request Example**
 ```http
-DELETE /posts/1/likes
+DELETE /api/v1/posts/1/likes
 ```
 **Response (Success)**
 - 200 0K 
@@ -540,7 +540,7 @@ DELETE /posts/1/likes
 
 **Request Example**
 ```http
-GET /posts/2/comments
+GET /api/v1/posts/2/comments
 ```
 **Response (200 OK)**
 ```json
@@ -615,7 +615,7 @@ GET /posts/2/comments
 
 **Request Example**
 ```http
-DELETE /posts/2/comments/1
+DELETE /api/v1/posts/2/comments/1
 ```
 **Response**
 - 204 No Content
@@ -636,7 +636,7 @@ DELETE /posts/2/comments/1
 
 **Request Example**
 ```http
-POST /posts/2/comments/2/likes
+POST /api/v1/posts/2/comments/2/likes
 ```
 **Response (200 OK)**
 ```json
@@ -667,7 +667,7 @@ POST /posts/2/comments/2/likes
 
 **Request Example**
 ```http
-POST /posts/2/comments/2/likes
+POST /api/v1/posts/2/comments/2/likes
 ```
 **Response (200 OK)**
 ```json
@@ -827,6 +827,23 @@ DELETE /api/v1/notifications/1
 
 ---
 
+## 공통 에러 응답 포맷 (Common Error Response)
+```json
+{
+    "status": 400,
+    "errorCode": "VAL-000",
+    "errorMessage": "이름을 입력해주세요.",
+    "path": "/api/v1/users/me/profile",
+    "timestamp": "2025-08-25T12:15:33.4753971"
+}
+```
+| 필드           | 타입     | 설명                  |
+| ------------ | ------ | ------------------- |
+| status       | int    | HTTP 상태 코드          |
+| errorCode    | String | 내부 에러 코드            |
+| errorMessage | String | 에러 메시지              |
+| path         | String | 요청한 API 경로          |
+| timestamp    | String | 에러 발생 시각 (ISO 8601) |
 
 ## 에러 코드
 | 구분   | HTTP Status      | 코드     | 메시지                                                  |
