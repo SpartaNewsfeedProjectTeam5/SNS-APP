@@ -52,7 +52,7 @@
 
 
 ### 로그인 (Login)
-**Endpoint:** `POST /auth/signup`
+**Endpoint:** `POST /auth/login`
 
 **Description:** 회원 로그인 처리
 
@@ -127,7 +127,7 @@
 
 
 **Request Example**
-```
+```http
 GET /api/v1/users/profile?email=user@example.com
 ```
 **Response (Success)**
@@ -241,7 +241,7 @@ GET /api/v1/users/profile?email=user@example.com
 
 
 **Request Example**
-```
+```http
 GET /api/v1/posts/myposts?page=0&size=10&sort=createdAt&direction=desc
 ```
 **Response (Success)**
@@ -287,7 +287,7 @@ GET /api/v1/posts/myposts?page=0&size=10&sort=createdAt&direction=desc
 
 
 **Request Example**
-```
+```http
 GET /api/v1/posts/following?page=0&size=10&sort=createdAt&direction=desc
 ```
 **Response (Success)**
@@ -337,11 +337,11 @@ GET /api/v1/posts/following?page=0&size=10&sort=createdAt&direction=desc
 
 **Request Example**
 email 검색 예시:
-```
+```http
 GET /api/v1/posts/search?keyword=user@example.com&searchType=email
 ```
 Date 타입 검색 예시:
-```
+```http
 GET /api/v1/posts/search?keyword=20250825~20250825&searchType=date
 ```
 **Response (Success)**
@@ -428,7 +428,7 @@ GET /api/v1/posts/search?keyword=20250825~20250825&searchType=date
 
 
 **Request Example**
-```
+```http
 DELETE /posts/1
 ```
 **Response (Success)**
@@ -448,7 +448,7 @@ DELETE /posts/1
 
 
 **Request Example**
-```
+```http
 POST /posts/2/likes
 ```
 **Response (Success)**
@@ -480,7 +480,7 @@ POST /posts/2/likes
 
 
 **Request Example**
-```
+```http
 DELETE /posts/1/likes
 ```
 **Response (Success)**
@@ -539,7 +539,7 @@ DELETE /posts/1/likes
 
 
 **Request Example**
-```
+```http
 GET /posts/2/comments
 ```
 **Response (200 OK)**
@@ -614,7 +614,7 @@ GET /posts/2/comments
 
 
 **Request Example**
-```
+```http
 DELETE /posts/2/comments/1
 ```
 **Response**
@@ -635,7 +635,7 @@ DELETE /posts/2/comments/1
 
 
 **Request Example**
-```
+```http
 POST /posts/2/comments/2/likes
 ```
 **Response (200 OK)**
@@ -666,7 +666,7 @@ POST /posts/2/comments/2/likes
 
 
 **Request Example**
-```
+```http
 POST /posts/2/comments/2/likes
 ```
 **Response (200 OK)**
@@ -745,7 +745,7 @@ POST /posts/2/comments/2/likes
 
 
 **Request Example**
-```
+```http
 GET /api/v1/follow/followers
 ```
 **Response (200 OK)**
@@ -778,7 +778,7 @@ GET /api/v1/follow/followers
 **Description:** 로그인한 사용자의 전체 알림 목록 조회
 
 **Request Example**
-```
+```http
 GET /api/v1/notifications
 ```
 **Response (200 OK)**
@@ -819,8 +819,8 @@ GET /api/v1/notifications
 **Description:** 로그인한 사용자의 확인된 알림 삭제
 
 **Request Example**
-```
-GET /api/v1/notifications/1
+```http
+DELETE /api/v1/notifications/1
 ```
 **Response (200 OK)**
 - No Content
