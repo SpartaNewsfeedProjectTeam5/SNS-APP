@@ -104,10 +104,6 @@
 
 **Description:** 로그인한 사용자의 세션 로그아웃 처리
 
-**Request Body**
-```json
-없음
-```
 **Response (Success)**
 ```json
 {
@@ -131,7 +127,7 @@
 
 
 **Request Example**
-```json
+```
 GET /api/v1/users/profile?email=user@example.com
 ```
 **Response (Success)**
@@ -245,7 +241,7 @@ GET /api/v1/users/profile?email=user@example.com
 
 
 **Request Example**
-```json
+```
 GET /api/v1/posts/myposts?page=0&size=10&sort=createdAt&direction=desc
 ```
 **Response (Success)**
@@ -291,7 +287,7 @@ GET /api/v1/posts/myposts?page=0&size=10&sort=createdAt&direction=desc
 
 
 **Request Example**
-```json
+```
 GET /api/v1/posts/following?page=0&size=10&sort=createdAt&direction=desc
 ```
 **Response (Success)**
@@ -341,11 +337,11 @@ GET /api/v1/posts/following?page=0&size=10&sort=createdAt&direction=desc
 
 **Request Example**
 email 검색 예시:
-```json
+```
 GET /api/v1/posts/search?keyword=user@example.com&searchType=email
 ```
 Date 타입 검색 예시:
-```json
+```
 GET /api/v1/posts/search?keyword=20250825~20250825&searchType=date
 ```
 **Response (Success)**
@@ -432,7 +428,7 @@ GET /api/v1/posts/search?keyword=20250825~20250825&searchType=date
 
 
 **Request Example**
-```json
+```
 DELETE /posts/1
 ```
 **Response (Success)**
@@ -452,7 +448,7 @@ DELETE /posts/1
 
 
 **Request Example**
-```json
+```
 POST /posts/2/likes
 ```
 **Response (Success)**
@@ -484,7 +480,7 @@ POST /posts/2/likes
 
 
 **Request Example**
-```json
+```
 DELETE /posts/1/likes
 ```
 **Response (Success)**
@@ -543,7 +539,7 @@ DELETE /posts/1/likes
 
 
 **Request Example**
-```json
+```
 GET /posts/2/comments
 ```
 **Response (200 OK)**
@@ -618,7 +614,7 @@ GET /posts/2/comments
 
 
 **Request Example**
-```json
+```
 DELETE /posts/2/comments/1
 ```
 **Response**
@@ -639,7 +635,7 @@ DELETE /posts/2/comments/1
 
 
 **Request Example**
-```json
+```
 POST /posts/2/comments/2/likes
 ```
 **Response (200 OK)**
@@ -670,7 +666,7 @@ POST /posts/2/comments/2/likes
 
 
 **Request Example**
-```json
+```
 POST /posts/2/comments/2/likes
 ```
 **Response (200 OK)**
@@ -749,7 +745,7 @@ POST /posts/2/comments/2/likes
 
 
 **Request Example**
-```json
+```
 GET /api/v1/follow/followers
 ```
 **Response (200 OK)**
@@ -782,7 +778,7 @@ GET /api/v1/follow/followers
 **Description:** 로그인한 사용자의 전체 알림 목록 조회
 
 **Request Example**
-```json
+```
 GET /api/v1/notifications
 ```
 **Response (200 OK)**
@@ -823,7 +819,7 @@ GET /api/v1/notifications
 **Description:** 로그인한 사용자의 확인된 알림 삭제
 
 **Request Example**
-```json
+```
 GET /api/v1/notifications/1
 ```
 **Response (200 OK)**
